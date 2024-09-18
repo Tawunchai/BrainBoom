@@ -1,23 +1,42 @@
 package config
 
-
 import (
+	"context"
+	"fmt"
+	"log"
+	"strings"
 
-   "fmt"
+	"time"
 
-   "time"
+	"github.com/Parichatx/user-system2/entity"
 
-   "github.com/Parichatx/user-system2/entity"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm/logger"
 
-   "gorm.io/driver/sqlite"
-
-   "gorm.io/gorm"
-
+	"gorm.io/gorm"
 )
 
 
 var db *gorm.DB
 
+type CustomLogger struct{}
+
+func (l *CustomLogger) LogMode(level logger.LogLevel) logger.Interface {
+	return l
+}
+
+func (l *CustomLogger) Info(ctx context.Context, msg string, args ...interface{}) {}
+
+func (l *CustomLogger) Warn(ctx context.Context, msg string, args ...interface{}) {}
+
+func (l *CustomLogger) Error(ctx context.Context, msg string, args ...interface{}) {
+	if !strings.Contains(msg, "record not found") {
+		log.Printf(msg, args...)
+	}
+}
+
+func (l *CustomLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
+}
 
 func DB() *gorm.DB {
 

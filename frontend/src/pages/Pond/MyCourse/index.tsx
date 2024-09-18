@@ -14,7 +14,7 @@ const Review: React.FC = () => {
   const [hasReviewed, setHasReviewed] = useState<{ [key: number]: boolean }>(
     {}
   );
-  const userId = 5; // userId ต้องมาจากข้อมูลผู้ใช้ที่ล็อกอินอยู่
+  const userId = 1; // userId ต้องมาจากข้อมูลผู้ใช้ที่ล็อกอินอยู่
   const [messageApi, contextHolder] = message.useMessage(); // ใช้ message API
 
   useEffect(() => {

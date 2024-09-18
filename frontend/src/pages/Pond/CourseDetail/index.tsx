@@ -4,6 +4,8 @@ import { useNavigate, useLocation  } from 'react-router-dom';
 import HeaderComponent from '../../../components/header';
 import moment from 'moment';
 import Example_Review from './Model/Example_Review';
+import ModalTest from "./Model/Model"; 
+import { useState } from 'react';
 
 const { Title, Text } = Typography;
 
@@ -12,10 +14,20 @@ function CourseDetail() {
   const location = useLocation();
   const course = location.state?.course;
   console.log(course.ID);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const updatedAt = course.UpdatedAt;
   const formattedDate = moment(updatedAt).format('DD MMMM YYYY');
   const formattedTime = moment(updatedAt).format('HH:mm');
+
+  const showModal = () => {
+    setIsModalVisible(true); // เปิด Modal
+  };
+
+  // ฟังก์ชันสำหรับปิด Modal
+  const handleCancel = () => {
+    setIsModalVisible(false); // ปิด Modal
+  };
 
   // Your existing code with course data rendering
   return (
@@ -94,7 +106,6 @@ function CourseDetail() {
                 padding: '20px',
               }}
             >
-            {course.ID}
               <Title level={2}>{course.Title || "Course Title"}</Title>
               <Text
                 style={{
@@ -174,7 +185,7 @@ function CourseDetail() {
                 gap: '15px',
               }}
             >
-              <Example_Review course_id={1}></Example_Review>
+              <Example_Review course_id={course.ID}></Example_Review>
             </div>
             <div
               style={{
@@ -192,7 +203,7 @@ function CourseDetail() {
                   textAlign: 'center',
                   color: '#002A48',
                   margin: '10px 0',
-                }}
+                }} onClick={showModal}
               >
                 ดูเพิ่มเติม
               </Button>
@@ -200,6 +211,7 @@ function CourseDetail() {
           </div>
         </div>
       </section>
+      <ModalTest isVisible={isModalVisible} handleCancel={handleCancel} id={course.ID} />
     </>
   );
 }
