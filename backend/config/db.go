@@ -43,13 +43,16 @@ func ConnectionDB() {
 }
 
 
-func SetupDatabase() {
+func SetupDatabase() error {
 
 	db.AutoMigrate(
 		&entity.Users{},
 		&entity.Genders{},
 		&entity.UserRoles{},
 		&entity.TutorProfiles{},
+		&entity.Courses{}, // edit
+		&entity.CourseCategories{}, // edit
+		&entity.Reviews{}, // edit
 	)
 
 	GenderMale := entity.Genders{Gender: "Male"}
@@ -114,5 +117,43 @@ func SetupDatabase() {
 	}
 
 	db.FirstOrCreate(TutorProfile, &entity.TutorProfiles{UserID: &TutorUser.ID})
+
+	// Seed a default Course Category
+	var courseCategory entity.CourseCategories
+	if err := db.Where("category_name = ?", "แนะนำสำหรับคุณ").First(&courseCategory).Error; err != nil {
+		courseCategory = entity.CourseCategories{CategoryName: "แนะนำสำหรับคุณ"}
+		if err := db.Create(&courseCategory).Error; err != nil {
+			return fmt.Errorf("failed to create CourseCategory: %w", err)
+		}
+	}
+
+	// Seed a default Tutor Profile
+	tutorProfile := &entity.TutorProfiles{
+		UserID: func(v uint) *uint { return &v }(User.ID), // Convert uint to *uint
+		Bio:    "Experienced software engineer with expertise in multiple programming languages.",
+	}
+	if err := db.FirstOrCreate(tutorProfile, &entity.TutorProfiles{UserID: tutorProfile.UserID}).Error; err != nil {
+		return fmt.Errorf("failed to create or find tutor profile: %w", err)
+	}
+
+	// Seed default Courses
+	for i := 1; i <= 10; i++ {
+		course := &entity.Courses{
+			Title:            fmt.Sprintf("Course %d", i),
+			ProfilePicture:   []byte{},
+			Price:            float32(1999 + i*100),
+			TeachingPlatform: "Online",
+			Description:      fmt.Sprintf("This course provides comprehensive content on various topics. Course number %d.", i),
+			Duration:         uint(40 + i), 
+			TutorProfileID:   tutorProfile.UserID,
+			CourseCategoryID: &courseCategory.ID,
+		}
+	
+		if err := db.FirstOrCreate(course, &entity.Courses{Title: course.Title}).Error; err != nil {
+			return fmt.Errorf("failed to create or find course %d: %w", i, err)
+		}
+	}
+
+	return nil
 
 }

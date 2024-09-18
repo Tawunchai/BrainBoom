@@ -1,24 +1,19 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/Parichatx/user-system2/config"
+	"github.com/Parichatx/user-system2/controller/course"
+	"github.com/Parichatx/user-system2/controller/tutor_profiles"
 	"github.com/Parichatx/user-system2/controller/users"
-	"github.com/Parichatx/user-system2/middlewares"
+	//"github.com/Parichatx/user-system2/middlewares"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 const PORT = "8000"
 
 func main() {
-	// โหลดไฟล์ .env
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
 
 	// เปิดการเชื่อมต่อฐานข้อมูล
 	config.ConnectionDB()
@@ -31,24 +26,39 @@ func main() {
 	// เพิ่ม Middleware สำหรับ CORS
 	r.Use(CORSMiddleware())
 
+	router := r.Group("")
+	{
+		// User By Eye
+		// เส้นทางสำหรับการสมัครสมาชิกและล็อกอิน
+		r.POST("/signup", users.SignUp)
+		r.POST("/signin", users.SignIn)
+		// กลุ่มเส้นทางที่ต้องการการยืนยันตัวตน
+		r.PUT("/users/:id", users.Update)
+		r.GET("/users", users.GetAll)
+		r.GET("/users/:id", users.Get)
+		r.DELETE("/users/:id", users.Delete)
+		r.GET("/tutor_profiles/:userID", tutor_profiles.GetTutorProfile) // edit by tawun
+
+		// Course Routes By Pond
+		router.GET("/courses", course.ListCourse)
+		router.GET("/courses/:id", course.GetCourse)
+		router.GET("/courses/category/:id", course.GetCourseByCategoryID)
+		router.GET("/tutor/:id", course.GetCourseByCategoryID)
+		router.POST("/courses", course.CreateCourse)
+		router.PUT("/courses/:id", course.UpdateCourse)
+		router.DELETE("/courses/:id", course.DeleteCourse)
+
+		//Review By Tawun
+
+	}
+
 	// เส้นทางตรวจสอบสถานะ API
 	r.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "API RUNNING... PORT: %s", PORT)
 	})
 
-	// เส้นทางสำหรับการสมัครสมาชิกและล็อกอิน
-	r.POST("/signup", users.SignUp)
-	r.POST("/signin", users.SignIn)
-
-	// กลุ่มเส้นทางที่ต้องการการยืนยันตัวตน
-	r.PUT("/users/:id", middlewares.Authorizes(), users.Update)
-	r.GET("/users", middlewares.Authorizes(), users.GetAll)
-	r.GET("/users/:id", middlewares.Authorizes(), users.Get)
-	r.DELETE("/users/:id", middlewares.Authorizes(), users.Delete)
-
 	// เส้นทางสำหรับ tutor profiles
 	// Route to get tutor profile by userID
-	r.GET("/tutor_profiles/:userID", GetTutorProfile)
 	//r.GET("/:id", tutor_profiles.GetTutorProfile)
 	//r.GET("/users/:id", tutor_profiles.GetTutorProfileByUserID)
 	//r.POST("/tutor_profiles", tutor_profiles.CreateTutorProfile)

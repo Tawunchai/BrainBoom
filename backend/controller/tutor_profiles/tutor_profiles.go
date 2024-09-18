@@ -2,11 +2,12 @@ package tutor_profiles
 
 import (
 	"net/http"
-	"github.com/gin-gonic/gin"
+
 	"github.com/Parichatx/user-system2/config"
 	"github.com/Parichatx/user-system2/entity"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
-
 
 // POST /tutor-profile
 func CreateTutorProfile(c *gin.Context) {
@@ -54,6 +55,7 @@ func GetTutorProfileByUserID(c *gin.Context) {
 func GetTutorProfile(c *gin.Context) {
     userID := c.Param("UserID") // ดึง userID จาก URL
     var profile entity.TutorProfiles
+	db := config.DB()
 
     // ดึงข้อมูลจากฐานข้อมูลโดยใช้ Gorm
     if err := db.Where("user_id = ?", userID).First(&profile).Error; err != nil {

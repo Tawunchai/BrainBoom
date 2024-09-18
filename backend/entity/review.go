@@ -7,7 +7,7 @@ type Reviews struct {
 	gorm.Model
 	Rating uint
 	Comment string
-	ReviewDate time.Time
+	ReviewDate time.Time // edit by tawun 
 
 
 	// UserId ทำหน้าที่เป็น FK

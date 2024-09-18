@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Layout, Avatar, ConfigProvider, MenuProps, Menu, message } from 'antd';
-import { BookOutlined, UserOutlined, ShoppingCartOutlined, LogoutOutlined } from '@ant-design/icons';
+import { BookOutlined, UserOutlined, ShoppingCartOutlined, LogoutOutlined,ShopOutlined,SearchOutlined } from '@ant-design/icons';
 import Logo from '../../assets/logo1.png';
 import { Link, useNavigate } from 'react-router-dom';
 import 'antd/dist/reset.css';
@@ -14,10 +14,20 @@ const items: MenuItem[] = [
     icon: <ShoppingCartOutlined />,
   },
   {
+    label: <Link to="/tutor">ขายคอร์ส</Link>, 
+    key: 'tuterCourse',
+    icon: <ShopOutlined />,
+  },
+  {
     label: <Link to="/myCourses">คอร์สของฉัน</Link>, 
     key: 'myCourse',
     icon: <BookOutlined />,
-  }
+  },
+  {
+    label: <Link to="/search">ค้นหา</Link>, 
+    key: 'search',
+    icon: <SearchOutlined />,
+  },
 ];
 
 const { Header } = Layout;
