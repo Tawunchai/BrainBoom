@@ -4,10 +4,12 @@ import { RouteObject, Navigate } from "react-router-dom";
 import MinimalLayout from "../layout/MinimalLayout";
 import Loadable from "../components/third-patry/Loadable";
 
+//User
 const MainPages = Loadable(lazy(() => import("../pages/authentication/Login")));
 const RegisterSelect = Loadable(lazy(() => import("../pages/authentication/RegisterSelect")));
 const StudentSignup = Loadable(lazy(() => import("../pages/authentication/RegisterStudent")));
 const TutorSignup1 = Loadable(lazy(() => import("../pages/authentication/RegisterTutor1")));
+//Course
 
 
 const MainRoutes = (): RouteObject => {

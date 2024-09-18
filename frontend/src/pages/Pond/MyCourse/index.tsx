@@ -1,4 +1,4 @@
-    import HeaderComponent from '../../components/header';
+    import HeaderComponent from '../../../components/header';
 
     function MyCourse() {
 
@@ -10,7 +10,7 @@
             padding: "95px 50px 30px 50px",
         }}
         >
-        
+        546554
         </section>
         </>
     );

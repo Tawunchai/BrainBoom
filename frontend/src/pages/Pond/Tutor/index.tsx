@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import HeaderComponent from '../../components/header';
+import HeaderComponent from '../../../components/header';
 import { Button, Input, Card, Row, Col, Typography, Space } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import { GetCourseByTutorID, DeleteCourse } from '../../services/https';
-import { CourseInterface } from '../../interfaces/ICourse';
+import { GetCourseByTutorID, DeleteCourse } from '../../../services/https';
+import { CourseInterface } from '../../../interfaces/ICourse';
 
 const { Search } = Input;
 const { Text, Title } = Typography;

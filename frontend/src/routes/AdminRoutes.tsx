@@ -12,6 +12,10 @@ const TutorProfile = Loadable(lazy(() => import("../pages/TutorProfile")));
 const EditTutor = Loadable(lazy(() => import("../pages/TutorProfile/edit")));
 const MyProfile = Loadable(lazy(() => import("../pages/TutorProfile/myprofile")));
 
+//Course
+const MainCourse = Loadable(lazy(() => import("../pages/Pond/Course/index")));
+const CourseDetails = Loadable(lazy(() => import("../pages/Pond/CourseDetail/index")));
+
 const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
   const userRoleId = parseInt(localStorage.getItem("user_role_id") || "0", 10);
   const id = localStorage.getItem('id') || 'Unknown User';
@@ -22,18 +26,26 @@ const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
     children: [
       {
         path: "/",
-        element: isLoggedIn ? (userRoleId === 2 ? <TutorProfile /> : <ProfileUser />) : <MainPages />,
+        element: isLoggedIn ? (userRoleId === 2 ? <MainCourse /> : <MainCourse />) : <MainPages />,
       },
       {
-        path: "users", // ไม่ใช้ "/users" เพราะ path จะถูก match โดยเริ่มจาก root
+        path: "course", 
+        element: isLoggedIn ? <MainCourse /> : <MainPages />,
+      },
+      {
+        path: "course/:id", // เส้นทางสำหรับ CourseDetail
+        element: isLoggedIn ? <CourseDetails /> : <MainPages />,
+      },
+      {
+        path: "users", 
         element: isLoggedIn ? (userRoleId === 2 ? <TutorProfile /> : <ProfileUser />) : <MainPages />,
         children: [
           {
-            path: "edit/:id", // เส้นทางสำหรับแก้ไข user
+            path: "edit/:id", 
             element: isLoggedIn ? <EditUser /> : <MainPages />,
           },
           {
-            path: "changepassword/:id", // เส้นทางสำหรับเปลี่ยนรหัสผ่าน
+            path: "changepassword/:id", 
             element: isLoggedIn ? <ChangePassword /> : <MainPages />,
           },
         ],
