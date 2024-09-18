@@ -1,25 +1,19 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/Parichatx/user-system2/config"
-	"github.com/Parichatx/user-system2/middlewares"
+	//"github.com/Parichatx/user-system2/middlewares"
 	"github.com/Parichatx/user-system2/controller/users"
 	"github.com/Parichatx/user-system2/controller/tutor_profiles"
-	"github.com/joho/godotenv"
 )
 
 const PORT = "8000"
 
 func main() {
-	// โหลดไฟล์ .env
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
+
 
 	// เปิดการเชื่อมต่อฐานข้อมูล
 	config.ConnectionDB()
@@ -47,7 +41,7 @@ func main() {
 	// กลุ่มเส้นทางที่ต้องการการยืนยันตัวตน
 	userRoutes := r.Group("/users")
 	{
-		userRoutes.Use(middlewares.Authorizes()) // ใช้ Middleware ตรวจสอบ Authorization
+		//userRoutes.Use(middlewares.Authorizes()) // ใช้ Middleware ตรวจสอบ Authorization
 		userRoutes.PUT("/:id", users.Update)
 		userRoutes.GET("/", users.GetAll)
 		userRoutes.GET("/:id", users.Get)
