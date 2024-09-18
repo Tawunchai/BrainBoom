@@ -10,7 +10,7 @@
             padding: "95px 50px 30px 50px",
         }}
         >
-        546554
+        MyCourse
         </section>
         </>
     );

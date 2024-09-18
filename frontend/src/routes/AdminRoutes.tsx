@@ -15,6 +15,9 @@ const MyProfile = Loadable(lazy(() => import("../pages/TutorProfile/myprofile"))
 //Course
 const MainCourse = Loadable(lazy(() => import("../pages/Pond/Course/index")));
 const CourseDetails = Loadable(lazy(() => import("../pages/Pond/CourseDetail/index")));
+const MyCourses = Loadable(lazy(() => import("../pages/Pond/MyCourse/index")));
+const TutorCourse = Loadable(lazy(() => import("../pages/Pond/Tutor/index")));
+const SearchCourse = Loadable(lazy(() => import("../pages/Pond/Search/index")));
 
 const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
   const userRoleId = parseInt(localStorage.getItem("user_role_id") || "0", 10);
@@ -27,6 +30,18 @@ const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
       {
         path: "/",
         element: isLoggedIn ? (userRoleId === 2 ? <MainCourse /> : <MainCourse />) : <MainPages />,
+      },
+      {
+        path: "myCourses", 
+        element: isLoggedIn ? <MyCourses /> : <MainPages />,
+      },
+      {
+        path: "tutor", 
+        element: isLoggedIn ? <TutorCourse /> : <MainPages />,
+      },
+      {
+        path: "search", 
+        element: isLoggedIn ? <SearchCourse /> : <MainPages />,
       },
       {
         path: "course", 
