@@ -14,7 +14,7 @@ type Users struct {
 	FirstName string    
    	LastName  string    
 	Birthday  time.Time	
-	Profile   string 	`json:"profile" gorm:"type:longtext"`
+	Profile   string 	`gorm:"type:longtext"` // edit
 
 	// UserRoleID ทำหน้าที่เป็น FK
 	UserRoleID uint `json:"user_role_id"`

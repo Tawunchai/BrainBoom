@@ -5,6 +5,8 @@ import (
 
 	"github.com/Parichatx/user-system2/config"
 	"github.com/Parichatx/user-system2/controller/course"
+	"github.com/Parichatx/user-system2/controller/like"
+	"github.com/Parichatx/user-system2/controller/review"
 	"github.com/Parichatx/user-system2/controller/tutor_profiles"
 	"github.com/Parichatx/user-system2/controller/users"
 	//"github.com/Parichatx/user-system2/middlewares"
@@ -35,7 +37,7 @@ func main() {
 		// กลุ่มเส้นทางที่ต้องการการยืนยันตัวตน
 		r.PUT("/users/:id", users.Update)
 		r.GET("/users", users.GetAll)
-		r.GET("/users/:id", users.Get)
+		r.GET("/users/:id", users.GetUserById)
 		r.DELETE("/users/:id", users.Delete)
 		r.GET("/tutor_profiles/:userID", tutor_profiles.GetTutorProfile) // edit by tawun
 
@@ -49,6 +51,16 @@ func main() {
 		router.DELETE("/courses/:id", course.DeleteCourse)
 
 		//Review By Tawun
+		router.GET("/user/:id", reviews.GetUserByIdReviews) // edit
+		router.GET("/reviews", reviews.ListReview)
+		router.POST("/reviews", reviews.CreateReview)
+		router.GET("/reviews/course/:id", reviews.GetReviewByCourseID)
+		router.GET("/reviews/filter", reviews.GetFilteredReviews)
+		router.GET("/reviews/search", reviews.SearchReviewsByKeyword)
+		router.GET("/course/:course_id/ratings", reviews.GetRatingsAvgByCourseID)
+		router.POST("/reviews/like", like.LikeReview)
+		router.DELETE("/reviews/unlike", like.UnlikeReview)
+		router.GET("/reviews/:userID/:reviewID/like", like.CheckUserLikeStatus)
 
 	}
 

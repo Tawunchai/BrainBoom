@@ -1,20 +1,23 @@
 package entity
 
-import ("gorm.io/gorm"  
-		"time" )
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Reviews struct {
-	gorm.Model
-	Rating uint
-	Comment string
-	ReviewDate time.Time // edit by tawun 
+    gorm.Model
+    Rating       uint
+    Comment      string
+    ReviewDate   time.Time
+    Picture      string `gorm:"type:longtext"`
 
+    UserID       *uint
+    User         Users `gorm:"foreignKey:UserID"`
 
-	// UserId ทำหน้าที่เป็น FK
-	UserID *uint
-	User   Users  `gorm:"foreignKey:UserID"`
+    CourseID     *uint
+    Course       Courses `gorm:"foreignKey:CourseID"`
 
-	// UserId ทำหน้าที่เป็น FK
-	CourseID *uint
-	Course   Courses  `gorm:"foreignKey:CourseID"`
+    Like []Like `gorm:"foreignKey:ReviewID"`
 }

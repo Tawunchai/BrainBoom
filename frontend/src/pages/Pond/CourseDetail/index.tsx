@@ -3,6 +3,7 @@ import { Card, Button, Typography, Divider } from 'antd';
 import { useNavigate, useLocation  } from 'react-router-dom';
 import HeaderComponent from '../../../components/header';
 import moment from 'moment';
+import Example_Review from './Model/Example_Review';
 
 const { Title, Text } = Typography;
 
@@ -173,50 +174,7 @@ function CourseDetail() {
                 gap: '15px',
               }}
             >
-              {/* {reviews.map((review) => (
-                <Card
-                  key={review.id}
-                  hoverable
-                  style={{
-                    borderRadius: '15px',
-                    overflow: 'hidden',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                    width: '100%',
-                    padding: '0px',
-                  }}
-                  bodyStyle={{ padding: '10px' }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '15px',
-                    }}
-                  >
-                    <img
-                      src={review.imageUrl}
-                      alt={review.name}
-                      style={{
-                        borderRadius: '50%',
-                        objectFit: 'cover',
-                        width: '65px',
-                        height: '65px',
-                      }}
-                    />
-                    <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                      <Text strong style={{ fontSize: '16px' }}>
-                        {review.name}
-                      </Text>
-                      <span style={{ color: '#FFD700', fontSize: '16px', fontWeight: 'bold' }}>
-                        {'★'.repeat(Math.floor(review.rating))}
-                      </span>
-                      <Text type="secondary" style={{ marginTop: '5px' }}>
-                        {review.comment}
-                      </Text>
-                    </div>
-                  </div>
-                </Card>
-              ))} */}
+              <Example_Review course_id={1}></Example_Review>
             </div>
             <div
               style={{

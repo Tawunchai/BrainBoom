@@ -29,7 +29,7 @@ func GetAll(c *gin.Context) {
     c.JSON(http.StatusOK, users)
 }
 
-func Get(c *gin.Context) {
+func GetUserById(c *gin.Context) {
     ID := c.Param("id")
     var user entity.Users
     db := config.DB()
@@ -39,7 +39,10 @@ func Get(c *gin.Context) {
         c.JSON(http.StatusNotFound, gin.H{"error": results.Error.Error()})
         return
     }
-
+    if user.ID == 0 {
+		c.JSON(http.StatusNoContent, gin.H{})
+		return
+	}
     c.JSON(http.StatusOK, user)
 }
 
