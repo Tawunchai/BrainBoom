@@ -139,8 +139,7 @@ const ModalTest: React.FC<ReviewModalProps> = ({
               ...review,
               Comment: comment.replace(
                 partialMatchRegex,
-                (match) => `<span style={{ fontWeight: "bold" }}>${match}</span>
-`
+                (match) => `<span class="highlighted-text">${match}</span>`
               ),
             };
           });

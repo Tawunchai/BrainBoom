@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { ReviewInterface } from '../../../../interfaces/IReview';
-import { GetReviewById, GetUserByIdReview } from '../../../../services/https';
-import { FaStar } from 'react-icons/fa';
-
+import React, { useEffect, useState } from "react";
+import { ReviewInterface } from "../../../../interfaces/IReview";
+import { GetReviewById, GetUserByIdReview } from "../../../../services/https";
+import { FaStar } from "react-icons/fa";
+import { Card } from "antd";
 interface ExampleReviewProps {
-  course_id: number; 
+  course_id: number;
 }
 
 const Example_Review: React.FC<ExampleReviewProps> = ({ course_id }) => {
@@ -19,29 +19,31 @@ const Example_Review: React.FC<ExampleReviewProps> = ({ course_id }) => {
 
       const userPromises = res.map(async (review) => {
         if (review.UserID) {
-          const { profile, fullName } = await getUserNameAndProfileById(review.UserID);
+          const { profile, fullName } = await getUserNameAndProfileById(
+            review.UserID
+          );
           return { name: fullName, profile };
         }
         return { name: "Unknown User", profile: "" };
       });
 
       const userInfos = await Promise.all(userPromises);
-      setUserNames(userInfos.map(info => info.name));
-      setUserProfiles(userInfos.map(info => info.profile));
+      setUserNames(userInfos.map((info) => info.name));
+      setUserProfiles(userInfos.map((info) => info.profile));
     }
   };
 
   const getUserNameAndProfileById = async (id: number) => {
     let user = await GetUserByIdReview(id);
     if (user) {
-        console.log("User Profile: ", user.Profile); // เพิ่มการตรวจสอบ URL ของโปรไฟล์
-        return {
-            fullName: `${user.FirstName ?? ""} ${user.LastName ?? ""}`,
-            profile: user.Profile || ""
-        };
+      console.log("User Profile: ", user.Profile); // เพิ่มการตรวจสอบ URL ของโปรไฟล์
+      return {
+        fullName: `${user.FirstName ?? ""} ${user.LastName ?? ""}`,
+        profile: user.Profile || "",
+      };
     }
     return { fullName: "", profile: "" };
-};
+  };
 
   const formatDate = (date?: Date | string) => {
     if (!date) return "Unknown Date";
@@ -91,24 +93,21 @@ const Example_Review: React.FC<ExampleReviewProps> = ({ course_id }) => {
       <div className="box-course-profile">
         {filteredReviews.length > 0 ? (
           filteredReviews.map((review, index) => (
-            <div key={review.ID} className="review-container">
-              <img
-                src={userProfiles[index] || ""}
-                className="review-profile-img"
-                alt="User Profile"
-              />
-              <div className="reviews-comment-text">
-                <p>Name: {userNames[index] ?? "Unknown User"}</p>
-                <p>
-                  Rating: {renderStarsUser(review.Rating ?? 0)}{" "}
-                </p>
-                <p>Comment: {renderComment(review.Comment)}</p>
-                <p>
-                  Review Date: {formatDate(review.ReviewDate)}
-                </p>
+            <Card>
+              <div key={review.ID} className="review-container">
+                <img
+                  src={userProfiles[index] || ""}
+                  className="review-profile-img"
+                  alt="User Profile"
+                />
+                <div className="reviews-comment-text">
+                  <p>Name: {userNames[index] ?? "Unknown User"}</p>
+                  <p>Rating: {renderStarsUser(review.Rating ?? 0)} <span className="date-review">{formatDate(review.ReviewDate)}</span></p>
+                  <p>{renderComment(review.Comment)}</p>
+                </div>
+                <hr />
               </div>
-              <hr />
-            </div>
+            </Card>
           ))
         ) : (
           <p>No Reviews Found.</p>

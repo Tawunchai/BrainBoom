@@ -89,7 +89,7 @@
 .date-review {
     font-size: 12px;
     color: #777;
-    margin-left: 20px;
+    margin-left: 10px;
 }
 
 .star-color-rating{
@@ -99,3 +99,8 @@
 .star-color-fail{
     color: #777;
 }
+
+.highlighted-text {
+    font-weight: bold;
+    font-size: 20px; 
+  }

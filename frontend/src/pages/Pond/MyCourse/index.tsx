@@ -14,17 +14,20 @@ const Review: React.FC = () => {
   const [hasReviewed, setHasReviewed] = useState<{ [key: number]: boolean }>(
     {}
   );
-  const userId = 1; // userId ต้องมาจากข้อมูลผู้ใช้ที่ล็อกอินอยู่
   const [messageApi, contextHolder] = message.useMessage(); // ใช้ message API
+  const [uid, setUid] = useState<number>(Number(localStorage.getItem("id")) || 0);
+
 
   useEffect(() => {
+    setUid(Number(localStorage.getItem("id"))); 
+    console.log(uid)
     const fetchAllReviews = async () => {
       const courseIds = [1, 2]; // รหัสคอร์สทั้งหมดที่เราต้องการตรวจสอบ เเก้ไข HardCode
       const reviewStatus: { [key: number]: boolean } = {};
 
       for (const id of courseIds) {
         const reviews = await GetReviewById(id);
-        const userReview = reviews.find((review) => review.UserID === userId);
+        const userReview = reviews.find((review) => review.UserID === uid);
         reviewStatus[id] = !!userReview;
       }
 
@@ -89,7 +92,7 @@ const Review: React.FC = () => {
                     open={isOpen}
                     onClose={() => setIsOpen(false)}
                     CourseID={currentCourseId}
-                    UserID={userId}
+                    UserID={uid}
                     onReviewSubmit={handleReviewSubmit}
                   />
                 )}
@@ -130,7 +133,7 @@ const Review: React.FC = () => {
                     open={isOpen}
                     onClose={() => setIsOpen(false)}
                     CourseID={currentCourseId}
-                    UserID={userId}
+                    UserID={uid}
                     onReviewSubmit={handleReviewSubmit}
                   />
                 )}
