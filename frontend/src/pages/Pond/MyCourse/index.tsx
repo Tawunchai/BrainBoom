@@ -59,7 +59,7 @@ const Review: React.FC = () => {
 
   return (
     <>
-      {contextHolder} 
+      {contextHolder}
       <HeaderComponent />
       <br />
       <br />
@@ -69,16 +69,22 @@ const Review: React.FC = () => {
         <div className="review-layer">
           {payments.map((payment, index) => (
             <div key={index} className="product-review">
-              <Link to={`/review/${payment.CourseID}`}>
-                <img
-                  src={payment.Course.ProfilePicture}
-                  alt={`${payment.Course.Title} Course`}
-                />{" "}
-              </Link>
+              <img
+                src={payment.Course.ProfilePicture}
+                alt={`${payment.Course.Title} Course`}
+                style={{
+                  width: "220px",
+                  height: "220px",
+                  borderRadius: "15px",
+                  objectFit: "cover",
+                }}
+              />
+
               <p className="text-product">
                 <strong>Name : {payment.Course.Title}</strong>
                 <br />
-                Tutor ID : {payment.Course.TutorProfileID}{" "} {/*เอาออกดีไหม เเล้วเอาเป็นอะไรดี ?*/}
+                Tutor ID : {payment.Course.TutorProfileID}{" "}
+                {/*เอาออกดีไหม เเล้วเอาเป็นอะไรดี ?*/}
                 <div className="button-open">
                   {hasReviewed[payment.CourseID!] ? (
                     <button

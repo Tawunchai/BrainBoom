@@ -6,7 +6,7 @@ import("gorm.io/gorm"
 type Courses struct {
 	gorm.Model
 	Title string
-	ProfilePicture []byte
+	ProfilePicture string `gorm:"type:longtext"`
 	Price float32
 	TeachingPlatform string
 	Description string
