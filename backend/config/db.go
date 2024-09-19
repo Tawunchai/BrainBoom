@@ -226,11 +226,10 @@ func SetupDatabase() error {
 		return fmt.Errorf("failed to create or find tutor profile: %w", err)
 	}
 
-	// Seed default Courses
 	for i := 1; i <= 10; i++ {
 		course := &entity.Courses{
 			Title:            fmt.Sprintf("Course %d", i),
-			ProfilePicture:   []byte{},
+			ProfilePicture:   []byte{}, // ค่าเริ่มต้นจะถูกกำหนดในภายหลัง
 			Price:            float32(1999 + i*100),
 			TeachingPlatform: "Online",
 			Description:      fmt.Sprintf("This course provides comprehensive content on various topics. Course number %d.", i),
@@ -238,11 +237,19 @@ func SetupDatabase() error {
 			TutorProfileID:   tutorProfile.UserID,
 			CourseCategoryID: &courseCategory.ID,
 		}
-
+	
+		// ใช้ if เพื่อตรวจสอบค่า i
+		if i == 1 {
+			course.ProfilePicture = []byte("picture 1") 
+		} else {
+			course.ProfilePicture = []byte(fmt.Sprintf("picture %d", i)) // สำหรับคอร์สที่ 2 ถึง 10
+		}
+	
 		if err := db.FirstOrCreate(course, &entity.Courses{Title: course.Title}).Error; err != nil {
 			return fmt.Errorf("failed to create or find course %d: %w", i, err)
 		}
 	}
+	
 
 	task1 := &entity.Tasks{
 		Title:     "Complete Golang Project",
