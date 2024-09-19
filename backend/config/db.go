@@ -241,9 +241,34 @@ func SetupDatabase() error {
 		// ใช้ if เพื่อตรวจสอบค่า i
 		if i == 1 {
 			course.ProfilePicture = []byte("picture 1") 
-		} else {
-			course.ProfilePicture = []byte(fmt.Sprintf("picture %d", i)) // สำหรับคอร์สที่ 2 ถึง 10
-		}
+		} 
+		if i == 2 {
+			course.ProfilePicture = []byte("picture 1") 
+		} 
+		if i == 3 {
+			course.ProfilePicture = []byte("picture 1") 
+		} 
+		if i == 4 {
+			course.ProfilePicture = []byte("picture 1") 
+		} 
+		if i == 5 {
+			course.ProfilePicture = []byte("picture 1") 
+		} 
+		if i == 6 {
+			course.ProfilePicture = []byte("picture 1") 
+		} 
+		if i == 7 {
+			course.ProfilePicture = []byte("picture 1") 
+		} 
+		if i == 8 {
+			course.ProfilePicture = []byte("picture 1") 
+		} 
+		if i == 9 {
+			course.ProfilePicture = []byte("picture 1") 
+		} 
+		if i == 10 {
+			course.ProfilePicture = []byte("picture 1") 
+		} 
 	
 		if err := db.FirstOrCreate(course, &entity.Courses{Title: course.Title}).Error; err != nil {
 			return fmt.Errorf("failed to create or find course %d: %w", i, err)
