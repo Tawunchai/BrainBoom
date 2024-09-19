@@ -6,8 +6,10 @@ import {
   BsCalendarFill,
   BsFillPersonPlusFill,
 } from 'react-icons/bs';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // นำเข้า useNavigate
 import LogoImage from '../../../assets/logo.png';
+import { Menu, MenuProps, message } from 'antd'; // นำเข้า message จาก antd
+import { LogoutOutlined } from '@ant-design/icons';
 
 interface SidebarProps {
   openSidebarToggle: boolean;
@@ -15,6 +17,23 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => {
+  const navigate = useNavigate(); // ใช้ useNavigate
+
+  const onClick: MenuProps['onClick'] = (e) => {
+    console.log('click ', e);
+
+    if (e.key === 'logout') {
+      // การกระทำการ logout ที่นี่
+      localStorage.clear(); // ลบข้อมูลทั้งหมดจาก localStorage
+
+      message.success("Logout successful");
+
+      setTimeout(() => {
+        navigate('/login'); // เปลี่ยนเส้นทางไปยังหน้า login
+      }, 2000);
+    }
+  };
+
   return (
     <aside id="sidebar" className={openSidebarToggle ? "sidebar-responsive" : ""}>
       <div className='sidebar-title'>
@@ -49,6 +68,23 @@ const Sidebar: React.FC<SidebarProps> = ({ openSidebarToggle, OpenSidebar }) => 
             <BsFillPersonPlusFill className='icon' /> Create User
           </Link>
         </li>
+        <Menu
+          onClick={onClick}
+          mode="horizontal"
+          items={[
+            {
+              label: 'ออกจากระบบ',
+              key: 'logout',
+              icon: <LogoutOutlined />,
+            }
+          ]}
+          style={{
+            backgroundColor: 'transparent',
+            border: 'none',
+            color: '#f0f0f0',
+            display: 'inline-block',
+          }}
+        />
       </ul>
     </aside>
   );

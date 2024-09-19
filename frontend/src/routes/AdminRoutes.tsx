@@ -38,11 +38,11 @@ const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
         path: "/", 
         element: isLoggedIn 
           ? (userRoleId === 3 
-              ? <MainDashboard />  // ถ้า role เป็น 3 ไปที่หน้า Dashboard
+              ? <MainDashboard />  
               : (userRoleId === 2 || userRoleId === 1) 
-              ? <MainCourse />  // ถ้า role เป็น 2 หรือ 1 ไปที่หน้า MainCourse
-              : <MainPages />) // ถ้า role อื่นไปที่หน้า MainPages
-          : <MainPages />,  // ถ้าไม่ได้ล็อกอินไปที่หน้า Login
+              ? <MainCourse /> 
+              : <MainPages />) 
+          : <MainPages />,  
       },
       {
         path: "/dashboard",
