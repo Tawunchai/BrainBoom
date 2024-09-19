@@ -262,5 +262,81 @@ func SetupDatabase() error {
 	db.FirstOrCreate(task1, &entity.Tasks{Title: task1.Title})
 	db.FirstOrCreate(task2, &entity.Tasks{Title: task2.Title})
 
+	//payment
+	puid1 := uint(3)
+	puid2 := uint(4)
+	puid3 := uint(5)
+	pcid1 := uint(1)
+	pcid2 := uint(2)
+	pcid3 := uint(3)
+	pcid4 := uint(4)
+	pcid6 := uint(6)
+	pcid7 := uint(7)
+	pcid8 := uint(8)
+	pcid9 := uint(9)
+	payment1 := &entity.Payments{
+		Amount: 1999,
+		EnrollmentDate: time.Now(),
+		UserID: &puid1,
+		CourseID: &pcid1,
+	}
+	payment2 := &entity.Payments{
+		Amount: 2999,
+		EnrollmentDate: time.Now(),
+		UserID: &puid1,
+		CourseID: &pcid2,
+	}
+	payment3 := &entity.Payments{
+		Amount: 3999,
+		EnrollmentDate: time.Now(),
+		UserID: &puid1,
+		CourseID: &pcid3,
+	}
+	payment4 := &entity.Payments{
+		Amount: 4999,
+		EnrollmentDate: time.Now(),
+		UserID: &puid2,
+		CourseID: &pcid3,
+	}
+	payment5 := &entity.Payments{
+		Amount: 5999,
+		EnrollmentDate: time.Now(),
+		UserID: &puid2,
+		CourseID: &pcid4,
+	}
+	payment6 := &entity.Payments{
+		Amount: 6999,
+		EnrollmentDate: time.Now(),
+		UserID: &puid2,
+		CourseID: &pcid6,
+	}
+	payment7 := &entity.Payments{
+		Amount: 7999,
+		EnrollmentDate: time.Now(),
+		UserID: &puid3,
+		CourseID: &pcid7,
+	}
+	payment8 := &entity.Payments{
+		Amount: 8999,
+		EnrollmentDate: time.Now(),
+		UserID: &puid3,
+		CourseID: &pcid8,
+	}
+	payment9 := &entity.Payments{
+		Amount: 9999,
+		EnrollmentDate: time.Now(),
+		UserID: &puid3,
+		CourseID: &pcid9,
+	}
+	db.FirstOrCreate(payment1, &entity.Payments{Amount: payment1.Amount})
+	db.FirstOrCreate(payment2, &entity.Payments{Amount: payment2.Amount})
+	db.FirstOrCreate(payment3, &entity.Payments{Amount: payment3.Amount})
+	db.FirstOrCreate(payment4, &entity.Payments{Amount: payment4.Amount})
+	db.FirstOrCreate(payment5, &entity.Payments{Amount: payment5.Amount})
+	db.FirstOrCreate(payment6, &entity.Payments{Amount: payment6.Amount})
+	db.FirstOrCreate(payment7, &entity.Payments{Amount: payment7.Amount})
+	db.FirstOrCreate(payment8, &entity.Payments{Amount: payment8.Amount})
+	db.FirstOrCreate(payment9, &entity.Payments{Amount: payment9.Amount})
+
 	return nil // ของ ปอนด์ เช็ค error
 }

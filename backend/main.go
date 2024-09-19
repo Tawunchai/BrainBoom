@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Parichatx/user-system2/config"
+	"github.com/Parichatx/user-system2/controller/payment"
 	"github.com/Parichatx/user-system2/controller/task"
 	"github.com/Parichatx/user-system2/controller/course"
 	"github.com/Parichatx/user-system2/controller/like"
@@ -71,6 +72,8 @@ func main() {
 		router.GET("/course", course.ListCourse)
         router.GET("/course-count", course.CountCourses)
 
+		//Payment By Max
+		r.GET("/payments/user/:userID", payment.GetPaymentByIdUser)
 	}
 
 	r.GET("/", func(c *gin.Context) {
