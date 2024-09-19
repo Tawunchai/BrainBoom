@@ -73,6 +73,7 @@ func SetupDatabase() error {
 		&entity.CourseCategories{}, // edit
 		&entity.Reviews{}, // edit
 		&entity.Like{}, // edit
+		&entity.Tasks{},
 	)
 
 	GenderMale := entity.Genders{Gender: "Male"}
@@ -196,6 +197,23 @@ func SetupDatabase() error {
 		}
 	}
 
-	return nil
+	task1 := &entity.Tasks{
+		Title:     "Complete Golang Project",
+		StartDate: time.Now().AddDate(0, 0, 1), // เริ่มต้นวันพรุ่งนี้
+		EndDate:   time.Now().AddDate(0, 0, 7), // สิ้นสุดอีก 7 วัน
+		AllDay:    false,
+		UserID:    &uid1,
+	}
 
+	task2 := &entity.Tasks{
+		Title:     "Prepare React Course Material",
+		StartDate: time.Now().AddDate(0, 0, 2), // เริ่มต้นอีก 2 วัน
+		EndDate:   time.Now().AddDate(0, 0, 5), // สิ้นสุดอีก 5 วัน
+		AllDay:    true,
+		UserID:    &uid1,
+	}
+	db.FirstOrCreate(task1, &entity.Tasks{Title: task1.Title})
+	db.FirstOrCreate(task2, &entity.Tasks{Title: task2.Title})
+
+	return nil // ของ ปอนด์ เช็ค error
 }

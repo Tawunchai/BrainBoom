@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Parichatx/user-system2/config"
+	"github.com/Parichatx/user-system2/controller/task"
 	"github.com/Parichatx/user-system2/controller/course"
 	"github.com/Parichatx/user-system2/controller/like"
 	"github.com/Parichatx/user-system2/controller/review"
@@ -31,15 +32,14 @@ func main() {
 	router := r.Group("")
 	{
 		// User By Eye
-		// เส้นทางสำหรับการสมัครสมาชิกและล็อกอิน
+
 		r.POST("/signup", users.SignUp)
 		r.POST("/signin", users.SignIn)
-		// กลุ่มเส้นทางที่ต้องการการยืนยันตัวตน
 		r.PUT("/users/:id", users.Update)
 		r.GET("/users", users.GetAll)
 		r.GET("/users/:id", users.GetUserById)
 		r.DELETE("/users/:id", users.Delete)
-		r.GET("/tutor_profiles/:userID", tutor_profiles.GetTutorProfile) // edit by tawun
+		r.GET("/tutor_profiles/:userID", tutor_profiles.GetTutorProfile) 
 
 		// Course Routes By Pond
 		router.GET("/courses", course.ListCourse)
@@ -51,7 +51,7 @@ func main() {
 		router.DELETE("/courses/:id", course.DeleteCourse)
 
 		//Review By Tawun
-		router.GET("/user/:id", reviews.GetUserByIdReviews) // edit
+		router.GET("/user/:id", reviews.GetUserByIdReviews) 
 		router.GET("/reviews", reviews.ListReview)
 		router.POST("/reviews", reviews.CreateReview)
 		router.GET("/reviews/course/:id", reviews.GetReviewByCourseID)
@@ -62,13 +62,22 @@ func main() {
 		router.DELETE("/reviews/unlike", like.UnlikeReview)
 		router.GET("/reviews/:userID/:reviewID/like", like.CheckUserLikeStatus)
 
+		//Admin By Pai
+		router.GET("/tasks", tasks.ListTasks)
+        router.GET("/tasks/:id", tasks.GetTaskById)
+        router.POST("/tasks", tasks.CreateTask)
+        router.PUT("/tasks/:id", tasks.UpdateTask)
+        router.DELETE("/tasks/:id", tasks.DeleteTask)
+		router.GET("/course", course.ListCourse)
+        router.GET("/course-count", course.CountCourses)
+
 	}
 
-	// เส้นทางตรวจสอบสถานะ API
 	r.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "API RUNNING... PORT: %s", PORT)
 	})
 
+	// ของ อาย ????
 	// เส้นทางสำหรับ tutor profiles
 	// Route to get tutor profile by userID
 	//r.GET("/:id", tutor_profiles.GetTutorProfile)

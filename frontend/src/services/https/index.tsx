@@ -486,6 +486,28 @@ export const onUnlikeButtonClick = async (reviewID: number, userID: number) => {
   }
 };
 
+// ของ ปาย
+async function GetTotalCourse() {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  let res = await fetch(`${apiUrl}/course-count`, requestOptions)
+    .then((res) => {
+      if (res.status == 200) {
+        return res.json();
+      } else {
+        return false;
+      }
+    });
+
+  return res;
+}
+
+
 
 // Export ฟังก์ชันทั้งหมด
 export {
@@ -507,4 +529,6 @@ export {
   GetCourseByCategoryID,
   GetCourseByTutorID,
   DeleteCourse,
+  //Admin Pai
+  GetTotalCourse,
 };
