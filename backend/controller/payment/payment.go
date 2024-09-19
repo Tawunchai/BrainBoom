@@ -8,12 +8,11 @@ import (
 )
 
 func GetPaymentByIdUser(c *gin.Context) {
-	userID := c.Param("userID") 
+	userID := c.Param("userID")
 
 	var payments []entity.Payments
 	db := config.DB()
 
-	
 	if err := db.Preload("User").Preload("Course").Where("user_id = ?", userID).Find(&payments).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -26,3 +25,4 @@ func GetPaymentByIdUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, payments)
 }
+

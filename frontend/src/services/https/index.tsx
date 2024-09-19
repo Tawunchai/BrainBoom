@@ -507,6 +507,33 @@ async function GetTotalCourse() {
   return res;
 }
 
+// Payment By Max
+async function GetPaymentByIdUser(userID: number): Promise<any> {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  try {
+    const res = await fetch(`${apiUrl}/payments/user/${userID}`, requestOptions);
+
+    if (res.status === 200) {
+      const payments = await res.json();
+      return payments;
+    } else if (res.status === 404) {
+      console.error("ไม่พบการชำระเงินสำหรับผู้ใช้ที่ระบุ");
+      return null;
+    } else {
+      console.error("เกิดข้อผิดพลาด:", res.statusText);
+      return false;
+    }
+  } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการเรียก API:", error);
+    return false;
+  }
+}
 
 
 // Export ฟังก์ชันทั้งหมด
@@ -531,4 +558,6 @@ export {
   DeleteCourse,
   //Admin Pai
   GetTotalCourse,
+  //Payment Max
+  GetPaymentByIdUser, // ตะวันใช้ get ข้อมูลลง mycourse
 };
