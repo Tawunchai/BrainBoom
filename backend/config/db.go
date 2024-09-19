@@ -5,17 +5,13 @@ import (
 	"fmt"
 	"log"
 	"strings"
-
 	"time"
 
 	"github.com/Parichatx/user-system2/entity"
-
 	"gorm.io/driver/sqlite"
-	"gorm.io/gorm/logger"
-
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
-
 
 var db *gorm.DB
 
@@ -36,29 +32,24 @@ func (l *CustomLogger) Error(ctx context.Context, msg string, args ...interface{
 }
 
 func (l *CustomLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
+	// ไม่ทำอะไรใน Trace
 }
 
 func DB() *gorm.DB {
-
-   return db
-
+	return db
 }
 
-
 func ConnectionDB() {
+	database, err := gorm.Open(sqlite.Open("sa.db?cache=shared"), &gorm.Config{
+		Logger: &CustomLogger{}, // ใช้ Custom Logger
+	})
 
-   database, err := gorm.Open(sqlite.Open("sa.db?cache=shared"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
 
-   if err != nil {
-
-       panic("failed to connect database")
-
-   }
-
-   fmt.Println("connected database")
-
-   db = database
-
+	fmt.Println("connected database")
+	db = database
 }
 
 
@@ -234,6 +225,8 @@ func SetupDatabase() error {
 	}
 	db.FirstOrCreate(task1, &entity.Tasks{Title: task1.Title})
 	db.FirstOrCreate(task2, &entity.Tasks{Title: task2.Title})
+
+	
 
 	return nil // ของ ปอนด์ เช็ค error
 }
