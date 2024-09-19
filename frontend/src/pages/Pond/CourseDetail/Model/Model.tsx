@@ -36,7 +36,7 @@ const ModalTest: React.FC<ReviewModalProps> = ({
   const [userProfiles, setUserProfiles] = useState<Record<number, string>>({}); 
   const [userNames, setUserNames] = useState<Record<number, string>>({}); 
   const [uid, setUid] = useState<number | null>( 
-    Number(localStorage.getItem("uid")) 
+    Number(localStorage.getItem("id")) 
   );
   const [averageRating, setAverageRating] = useState<number>(0); 
   const [totalReviews, setTotalReviews] = useState<number>(0); 
@@ -44,8 +44,8 @@ const ModalTest: React.FC<ReviewModalProps> = ({
 
   
   useEffect(() => {
-    localStorage.setItem("uid", String(1)); 
-    setUid(Number(localStorage.getItem("uid"))); 
+    setUid(Number(localStorage.getItem("id"))); 
+    console.log(uid)
 
     const fetchData = async () => {
       

@@ -91,3 +91,11 @@
     color: #777;
     margin-left: 20px;
 }
+
+.star-color-rating{
+    color: gold;
+}
+
+.star-color-fail{
+    color: #777;
+}
