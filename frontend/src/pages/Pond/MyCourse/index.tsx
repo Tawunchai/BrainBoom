@@ -9,20 +9,15 @@ import "./popup.css";
 const Review: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [currentCourseId, setCurrentCourseId] = useState<number | null>(null);
-  const [hasReviewed, setHasReviewed] = useState<{ [key: number]: boolean }>(
-    {}
-  );
+  const [hasReviewed, setHasReviewed] = useState<{ [key: number]: boolean }>({});
   const [payments, setPayments] = useState<PaymentsReviewInterface[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
-  const [uid, setUid] = useState<number>(
-    Number(localStorage.getItem("id")) || 0
-  );
+  const [uid, setUid] = useState<number>(Number(localStorage.getItem("id")) || 0);
 
   useEffect(() => {
     setUid(Number(localStorage.getItem("id")));
     const fetchAllReviewsAndPayments = async () => {
       const reviewStatus: { [key: number]: boolean } = {};
-
       const paymentsData = await GetPaymentByIdUser(uid);
 
       if (!paymentsData || paymentsData.length === 0) return;
@@ -68,30 +63,29 @@ const Review: React.FC = () => {
         <div className="review-layer">
           {payments.map((payment, index) => (
             <div key={index} className="product-review">
-              <img
-                src={payment.Course.ProfilePicture}
-                alt={`${payment.Course.Title} Course`}
-                style={{
-                  width: "220px",
-                  height: "220px",
-                  borderRadius: "15px",
-                  objectFit: "cover",
-                }}
-              />
-
+              {payment.Course.ProfilePicture ? (
+                <img
+                  src={payment.Course.ProfilePicture} // หรือ image/png ขึ้นอยู่กับชนิดภาพ
+                  alt={`${payment.Course.Title} Course`}
+                  style={{
+                    width: "220px",
+                    height: "220px",
+                    borderRadius: "15px",
+                  }}
+                />
+              ) : (
+                <div>No image available</div> // แสดงข้อความถ้าไม่มีภาพ
+              )}
               <p className="text-product">
                 <strong>Name : {payment.Course.Title}</strong>
                 <br />
-                Tutor ID : {payment.Course.TutorProfileID}{" "}
-                {/*เอาออกดีไหม เเล้วเอาเป็นอะไรดี ?*/}
+                Tutor ID : {payment.Course.TutorProfileID}
                 <div className="button-open">
                   {hasReviewed[payment.CourseID!] ? (
                     <button
                       className="button-open-model"
                       onClick={() =>
-                        messageApi.warning(
-                          "You have already reviewed this course."
-                        )
+                        messageApi.warning("You have already reviewed this course.")
                       }
                     >
                       Already Reviewed
