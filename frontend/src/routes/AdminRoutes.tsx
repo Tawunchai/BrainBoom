@@ -26,6 +26,9 @@ const AdminCourse = Loadable(lazy(() => import("../pages/Pai/course/Course")));
 const AdminCalender= Loadable(lazy(() => import("../pages/Pai/calendar/Calendar")));
 const AdminCreateUser= Loadable(lazy(() => import("../pages/Pai/createUser/CreateUser")));
 
+//Payment
+const MainPayment = Loadable(lazy(() => import("../pages/Payment/index")));
+
 const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
   const userRoleId = parseInt(localStorage.getItem("user_role_id") || "0", 10);
   const id = localStorage.getItem('id') || 'Unknown User';
@@ -83,6 +86,10 @@ const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
       { // ปอน
         path: "course/:id", // เส้นทางสำหรับ CourseDetail
         element: isLoggedIn ? <CourseDetails /> : <MainPages />,
+      },
+      { // เเม็ก
+        path: "payment", // เส้นทางสำหรับ CourseDetail
+        element: isLoggedIn ? <MainPayment /> : <MainPages />,
       },
       { // อาย
         path: "users", 

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import Modal from "./CreateReview/Pop_Up";
 import { GetReviewById, GetPaymentByIdUser } from "../../../services/https";
 import { message } from "antd";
-import { PaymentsInterface } from "../../../interfaces/IPayment";
+import { PaymentsReviewInterface } from "../../../interfaces/IPayment";
 import "./popup.css";
 
 const Review: React.FC = () => {
@@ -13,7 +13,7 @@ const Review: React.FC = () => {
   const [hasReviewed, setHasReviewed] = useState<{ [key: number]: boolean }>(
     {}
   );
-  const [payments, setPayments] = useState<PaymentsInterface[]>([]);
+  const [payments, setPayments] = useState<PaymentsReviewInterface[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
   const [uid, setUid] = useState<number>(
     Number(localStorage.getItem("id")) || 0

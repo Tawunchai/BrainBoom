@@ -294,7 +294,7 @@ func SetupDatabase() error {
 	db.FirstOrCreate(task1, &entity.Tasks{Title: task1.Title})
 	db.FirstOrCreate(task2, &entity.Tasks{Title: task2.Title})
 
-	//payment
+	//payment ตะวันสร้างจำนองเพื่อเรียก รีวิว  ByIdUser 
 	puid1 := uint(3)
 	puid2 := uint(4)
 	puid3 := uint(5)

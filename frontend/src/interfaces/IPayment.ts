@@ -1,6 +1,6 @@
 import { CourseInterface } from './ICourse';
 
-export interface PaymentsInterface {
+export interface PaymentsReviewInterface { // ตะวันใช้อยู่ 
     ID?: number;
     Amount: number;
     EnrollmentDate: string;
@@ -8,3 +8,11 @@ export interface PaymentsInterface {
     CourseID?: number;
     Course: CourseInterface; 
 }
+
+export interface PaymentsInterface {
+    ID?: number;
+    Amount?: number;
+    EnrollmentDate?: Date;
+    UserID?: number;
+    CourseID?: number;
+  }

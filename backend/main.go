@@ -73,7 +73,11 @@ func main() {
         router.GET("/course-count", course.CountCourses)
 
 		//Payment By Max
-		r.GET("/payments/user/:userID", payment.GetPaymentByIdUser)
+		r.GET("/payments/user/:userID", payment.GetPaymentByIdUser) // ตะวันใช้เรียกดู user in MyCourse 
+		router.GET("/payments", payment.ListAllPayments)
+		router.GET("/course-price/:id", payment.GetCoursePrice)
+		router.GET("/course-title/:id", payment.GetCourseName)
+		router.POST("/payment", payment.CreatePayment)
 	}
 
 	r.GET("/", func(c *gin.Context) {
