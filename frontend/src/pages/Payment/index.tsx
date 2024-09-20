@@ -125,7 +125,7 @@ function Payment() {
       }}
     >
       <HeaderComponent />
-        <Content style={{ backgroundColor: "white" }}>
+        <Content style={{ backgroundColor: "white" ,height:"100%"}}>
           <Row gutter={32}>
             {/* Left Section: Payment Form */}
             <Col span={14}>
