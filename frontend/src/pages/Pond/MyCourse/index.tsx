@@ -65,7 +65,7 @@ const Review: React.FC = () => {
             <div key={index} className="product-review">
               {payment.Course.ProfilePicture ? (
                 <img
-                  src={payment.Course.ProfilePicture} // หรือ image/png ขึ้นอยู่กับชนิดภาพ
+                  src={payment.Course.ProfilePicture} 
                   alt={`${payment.Course.Title} Course`}
                   style={{
                     width: "220px",
