@@ -3,7 +3,6 @@ import { ReviewInterface } from "../../../../interfaces/IReview";
 import { GetReviewById, GetUserByIdReview } from "../../../../services/https";
 import { FaStar } from "react-icons/fa";
 import { Card, Divider } from "antd";
-import Like from "../../../../Feature/Like";
 interface ExampleReviewProps {
   course_id: number;
 }
@@ -75,7 +74,7 @@ const Example_Review: React.FC<ExampleReviewProps> = ({ course_id }) => {
 
   const truncateComment = (comment?: string) => {
     if (!comment) return "";
-    return comment.length > 100 ? `${comment.slice(0, 100)}...` : comment;
+    return comment.length > 300 ? `${comment.slice(0, 300)}...` : comment;
   };
 
   const renderComment = (comment?: string) => {
@@ -96,37 +95,50 @@ const Example_Review: React.FC<ExampleReviewProps> = ({ course_id }) => {
   }, [course_id]);
 
   return (
-    <div>
-      <div className="box-course-profile">
-        {filteredReviews.length > 0 ? (
-          filteredReviews.map((review, index) => (
-            <Card>
-              <div key={review.ID} className="review-container">
-                <img
-                  src={userProfiles[index] || ""}
-                  className="review-profile-img"
-                  alt="User Profile"
-                />
-                <div className="reviews-comment-text">
-                  <p>Name: {userNames[index] ?? "Unknown User"}</p>
-                  <p>
-                    Rating: {renderStarsUser(review.Rating ?? 0)}{" "}
-                    <span className="date-review">
-                      {formatDate(review.ReviewDate)}
-                    </span>
-                  </p>
-                  <p>{renderComment(review.Comment)}</p>
-                  <Like reviewID={review.ID ?? 0} userID={uid ?? 0} />
-                  <Divider />
+    <Card>
+      <div className="example-reviews">
+        <div className="box-course-profile">
+          {filteredReviews.length > 0 ? (
+            filteredReviews.map((review, index) => (
+              <p>
+                <div key={review.ID} className="review-container">
+                  <img
+                    src={userProfiles[index] || ""}
+                    className="review-profile-img"
+                    alt="User Profile"
+                  />
+                  <div className="reviews-comment-text">
+                    <p>Name: {userNames[index] ?? "Unknown User"}</p>
+                    <p>
+                      Rating: {renderStarsUser(review.Rating ?? 0)}{" "}
+                      <span className="date-review">
+                        {formatDate(review.ReviewDate)}
+                      </span>
+                    </p>
+                    <p>{renderComment(review.Comment)}</p>
+                    {review.Picture && (
+                      <img
+                        src={review.Picture}
+                        alt="Preview"
+                        style={{
+                          width: "100px",
+                          height: "60px",
+                          objectFit: "cover",
+                          borderRadius: "0px",
+                        }}
+                      />
+                    )}
+                  </div>
                 </div>
-              </div>
-            </Card>
-          ))
-        ) : (
-          <p>No Reviews for Course</p>
-        )}
+                <Divider />
+              </p>
+            ))
+          ) : (
+            <p>No Reviews for Course</p>
+          )}
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
