@@ -74,7 +74,7 @@ const Review: React.FC = () => {
                   }}
                 />
               ) : (
-                <div>No image availableiiiiiiiiiiiiiiiiiiiiii</div> // แสดงข้อความถ้าไม่มีภาพ
+                <div>No image available</div> // แสดงข้อความถ้าไม่มีภาพ
               )}
               <p className="text-product">
                 <strong>Name : {payment.Course.Title}</strong>
