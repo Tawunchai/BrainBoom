@@ -105,3 +105,8 @@
     font-weight: bold;
     font-size: 20px; 
   }
+
+  .example-reviews{
+    height: 180px;
+    overflow-y: auto; 
+  }

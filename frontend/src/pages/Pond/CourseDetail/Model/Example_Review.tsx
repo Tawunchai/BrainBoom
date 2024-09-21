@@ -96,11 +96,12 @@ const Example_Review: React.FC<ExampleReviewProps> = ({ course_id }) => {
   }, [course_id]);
 
   return (
+    <Card>
     <div className="example-reviews">
       <div className="box-course-profile">
         {filteredReviews.length > 0 ? (
           filteredReviews.map((review, index) => (
-            <Card>
+            <p>
               <div key={review.ID} className="review-container">
                 <img
                   src={userProfiles[index] || ""}
@@ -120,13 +121,14 @@ const Example_Review: React.FC<ExampleReviewProps> = ({ course_id }) => {
               </div>
               <Like reviewID={review.ID ?? 0} userID={uid ?? 0} />
               <Divider />
-            </Card>
+            </p>
           ))
         ) : (
           <p>No Reviews for Course</p>
         )}
       </div>
     </div>
+    </Card>
   );
 };
 
