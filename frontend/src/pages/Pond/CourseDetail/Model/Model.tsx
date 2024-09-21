@@ -374,7 +374,6 @@ const ModalTest: React.FC<ReviewModalProps> = ({
                         {" "}
                      
                         <p style={{ fontWeight: "bold" }}>
-                          {" "}
                      
                           {userNames[review.UserID ?? 0]}
                         </p>

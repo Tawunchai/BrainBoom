@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { ReviewInterface } from "../../../../interfaces/IReview";
 import { GetReviewById, GetUserByIdReview } from "../../../../services/https";
 import { FaStar } from "react-icons/fa";
-import { Card } from "antd";
+import { Card, Divider } from "antd";
+import Like from "../../../../Feature/Like";
 interface ExampleReviewProps {
   course_id: number;
 }
@@ -11,6 +12,9 @@ const Example_Review: React.FC<ExampleReviewProps> = ({ course_id }) => {
   const [filteredReviews, setFilteredReviews] = useState<ReviewInterface[]>([]);
   const [userNames, setUserNames] = useState<string[]>([]);
   const [userProfiles, setUserProfiles] = useState<string[]>([]);
+  const [uid, setUid] = useState<number | null>(
+    Number(localStorage.getItem("id"))
+  );
 
   const getReviewsById = async (id: number) => {
     let res = await GetReviewById(id);
@@ -85,11 +89,14 @@ const Example_Review: React.FC<ExampleReviewProps> = ({ course_id }) => {
       await getReviewsById(course_id); // ใช้ course_id จาก props
     };
 
+    setUid(Number(localStorage.getItem("id")));
+    console.log(uid);
+
     fetchReviews();
   }, [course_id]);
 
   return (
-    <div>
+    <div className="example-reviews">
       <div className="box-course-profile">
         {filteredReviews.length > 0 ? (
           filteredReviews.map((review, index) => (
@@ -102,15 +109,21 @@ const Example_Review: React.FC<ExampleReviewProps> = ({ course_id }) => {
                 />
                 <div className="reviews-comment-text">
                   <p>Name: {userNames[index] ?? "Unknown User"}</p>
-                  <p>Rating: {renderStarsUser(review.Rating ?? 0)} <span className="date-review">{formatDate(review.ReviewDate)}</span></p>
+                  <p>
+                    Rating: {renderStarsUser(review.Rating ?? 0)}{" "}
+                    <span className="date-review">
+                      {formatDate(review.ReviewDate)}
+                    </span>
+                  </p>
                   <p>{renderComment(review.Comment)}</p>
                 </div>
-                <hr />
               </div>
+              <Like reviewID={review.ID ?? 0} userID={uid ?? 0} />
+              <Divider />
             </Card>
           ))
         ) : (
-          <p>No Reviews Found.</p>
+          <p>No Reviews for Course</p>
         )}
       </div>
     </div>

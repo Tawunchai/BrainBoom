@@ -303,7 +303,6 @@ func SetupDatabase() error {
 	pcid3 := uint(3)
 	pcid4 := uint(4)
 	pcid6 := uint(6)
-	pcid7 := uint(7)
 	pcid8 := uint(8)
 	pcid9 := uint(9)
 	payment1 := &entity.Payments{
@@ -346,7 +345,7 @@ func SetupDatabase() error {
 		Amount: 7999,
 		EnrollmentDate: time.Now(),
 		UserID: &puid3,
-		CourseID: &pcid7,
+		CourseID: &pcid3,
 	}
 	payment8 := &entity.Payments{
 		Amount: 8999,

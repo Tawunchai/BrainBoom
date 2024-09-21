@@ -5,6 +5,7 @@ import { GetReviewById, GetPaymentByIdUser } from "../../../services/https";
 import { message } from "antd";
 import { PaymentsReviewInterface } from "../../../interfaces/IPayment";
 import "./popup.css";
+import { Card } from "antd";
 
 const Review: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -37,7 +38,7 @@ const Review: React.FC = () => {
 
   const openModal = (id: number) => {
     if (hasReviewed[id]) {
-      messageApi.warning("You have already reviewed this course.");
+      messageApi.warning("คุณได้ทำการรีวิวแล้ว");
       return;
     }
     setCurrentCourseId(id);
@@ -60,19 +61,16 @@ const Review: React.FC = () => {
       <br />
       <br />
       <div className="setcourse">
-        <div className="review-layer">
+        <div className="review-layer"> {/*ตัวจัด 1fr 1fr*/}
           {payments.map((payment, index) => (
-            <div key={index} className="product-review">
+            <Card className="product-review">
               {payment.Course.ProfilePicture ? (
+                <div className="custom-image">
                 <img
-                  src={payment.Course.ProfilePicture} 
+                  src={payment.Course.ProfilePicture}
                   alt={`${payment.Course.Title} Course`}
-                  style={{
-                    width: "220px",
-                    height: "220px",
-                    borderRadius: "15px",
-                  }}
                 />
+              </div>  
               ) : (
                 <div>No image available</div> // แสดงข้อความถ้าไม่มีภาพ
               )}
@@ -85,7 +83,7 @@ const Review: React.FC = () => {
                     <button
                       className="button-open-model"
                       onClick={() =>
-                        messageApi.warning("You have already reviewed this course.")
+                        messageApi.warning("คุณได้ทำการรีวิวแล้ว")
                       }
                     >
                       Already Reviewed
@@ -109,7 +107,7 @@ const Review: React.FC = () => {
                   )}
                 </div>
               </p>
-            </div>
+            </Card>
           ))}
         </div>
       </div>
