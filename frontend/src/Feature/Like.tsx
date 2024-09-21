@@ -59,7 +59,7 @@ const Like: React.FC<LikeProps> = ({ reviewID, userID }) => {
                     onClick={handleLikeIconClick} 
                     style={{ cursor: 'pointer' }} 
                 />
-                <span>{likeCount}</span> {/* แสดงจำนวนไลค์ */}
+                <span>{likeCount}</span> 
             </div>
         </div>
     ); 
