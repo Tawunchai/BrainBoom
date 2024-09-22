@@ -2,7 +2,7 @@ package tutor_profiles
 
 import (
 	"net/http"
-
+	"errors"
 	"github.com/Parichatx/user-system2/config"
 	"github.com/Parichatx/user-system2/entity"
 	"github.com/gin-gonic/gin"
@@ -36,19 +36,24 @@ func CreateTutorProfile(c *gin.Context) {
 
 
 func GetTutorProfileByUserID(c *gin.Context) {
-    userID := c.Param("UserID")
-    var tutorProfile entity.TutorProfiles
+    userID := c.Param("id")
+    var TutorProfile entity.TutorProfiles
     db := config.DB()
 
-    // Query the tutor profile by userID
-    result := db.Where("user_id = ?", userID).First(&tutorProfile)
+    result := db.Where("user_id = ?", userID).First(&TutorProfile)
+
     if result.Error != nil {
-        c.JSON(http.StatusNotFound, gin.H{"error": "TutorProfile not found"})
+        if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+            c.JSON(http.StatusNotFound, gin.H{"error": "TutorProfile not found"})
+        } else {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+        }
         return
     }
 
-    c.JSON(http.StatusOK, tutorProfile)
+    c.JSON(http.StatusOK, TutorProfile)
 }
+
 
 
 // GET /tutor-profile/:id

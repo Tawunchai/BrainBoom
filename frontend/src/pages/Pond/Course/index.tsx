@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Card, Button } from "antd";
 import { Star } from "phosphor-react";
-import { Link, useNavigate} from "react-router-dom";
-import HeaderComponent from '../../../components/header';
-import { GetCourses } from "../../../services/https";
+import { Link, useNavigate } from "react-router-dom";
+import HeaderComponent from "../../../components/header";
+import { GetCourses, GetReviewById } from "../../../services/https";
 import { CourseInterface } from "../../../interfaces/ICourse";
+import { ReviewInterface } from "../../../interfaces/IReview";
 
 const { Meta } = Card;
 
@@ -12,6 +13,12 @@ function Course() {
   const [courses, setCourses] = useState<CourseInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<{
+    [courseID: number]: ReviewInterface[];
+  }>({});
+  const [averageRatings, setAverageRatings] = useState<{
+    [courseID: number]: number;
+  }>({});
 
   const navigate = useNavigate();
 
@@ -21,10 +28,10 @@ function Course() {
 
   const getCourses = async () => {
     try {
-      const res = await GetCourses();
-      console.log("Courses fetched:", res);
-      if (res) {
-        setCourses(res);
+      const courseData = await GetCourses();
+      console.log("Courses fetched:", courseData);
+      if (courseData) {
+        setCourses(courseData);
       } else {
         setError("No courses found");
       }
@@ -40,9 +47,40 @@ function Course() {
     }
   };
 
+  const fetchReviews = async (courseID: number) => {
+    try {
+      const reviewsData = await GetReviewById(courseID);
+      setReviews((prevReviews) => ({
+        ...prevReviews,
+        [courseID]: reviewsData,
+      }));
+
+      // Calculate average rating for the course
+      const ratings = reviewsData.map((review) => review.Rating ?? 0);
+      const average =
+        ratings.length > 0
+          ? ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length
+          : 0;
+      setAverageRatings((prevRatings) => ({
+        ...prevRatings,
+        [courseID]: parseFloat(average.toFixed(1)),
+      }));
+    } catch (error) {
+      console.error(`Error fetching reviews for course ${courseID}:`, error);
+    }
+  };
+
   useEffect(() => {
     getCourses();
   }, []);
+
+  useEffect(() => {
+    if (courses.length > 0) {
+      courses.forEach((course) => {
+        fetchReviews(course.ID as number);
+      });
+    }
+  }, [courses]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
@@ -78,8 +116,7 @@ function Course() {
                 paddingBottom: "15px",
               }}
             >
-              {courses.map((course: CourseInterface) => (
-                
+              {courses.slice(0, 7).map((course: CourseInterface) => (
                 <div key={course.ID} onClick={() => handleCourseClick(course)}>
                   <Card
                     key={`course-card-${course.ID}`}
@@ -87,7 +124,10 @@ function Course() {
                     cover={
                       <img
                         alt={course.Title}
-                        src={course.ProfilePicture || "https://via.placeholder.com/200x200"} 
+                        src={
+                          course.ProfilePicture ||
+                          "https://via.placeholder.com/200x200"
+                        }
                         style={{
                           borderRadius: "20px",
                           height: "200px",
@@ -119,14 +159,33 @@ function Course() {
                         display: "flex",
                         alignItems: "center",
                         fontSize: "12px",
-                        gap:"5px",
+                        gap: "5px",
                       }}
                     >
                       <Star
                         size={15}
                         weight="fill"
                         style={{ color: "#ffcc00", marginLeft: "5px" }}
-                      />5.0
+                      />
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <span
+                          style={{
+                            marginLeft: "10px",
+                            fontSize: "18px",
+                            fontWeight: "bold",
+                            color: "rgb(99, 94, 94)",
+                          }}
+                        >
+                          {course.ID !== undefined &&
+                          reviews[course.ID]?.length > 0
+                            ? `${reviews[
+                                course.ID
+                              ].length.toLocaleString()} Course Rating: ${
+                                averageRatings[course.ID] || 0
+                              } Ratings`
+                            : "0 Course Rating: 0 Ratings"}
+                        </span>
+                      </div>
                     </div>
                     <div
                       style={{
@@ -143,7 +202,7 @@ function Course() {
                 </div>
               ))}
               <div
-                key={`more-btn-${category.id}`} 
+                key={`more-btn-${category.id}`}
                 style={{
                   flex: "none",
                   display: "flex",
@@ -152,7 +211,10 @@ function Course() {
                   width: "100px",
                 }}
               >
-                <Link to={`/course/category/${category.id}`} style={{ textDecoration: "none" }}>
+                <Link
+                  to={`/course/category/${category.id}`}
+                  style={{ textDecoration: "none" }}
+                >
                   <Button
                     type="link"
                     style={{

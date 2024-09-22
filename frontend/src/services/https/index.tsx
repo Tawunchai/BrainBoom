@@ -113,16 +113,16 @@ async function UpdatePasswordById(
 }
 
 // ดึงข้อมูลโปรไฟล์ของ tutor ตาม ID
-async function GetTutorProfileById(UserID: string) {
+async function GetTutorProfileById(UserID: number) {
   return await axios
     .get(`${apiUrl}/tutor_profiles/${UserID}`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: getAuthHeader(), // ส่ง Authorization Header ในคำขอ
+        Authorization: getAuthHeader(),
       },
     })
-    .then((res) => res) // ส่งคืนผลลัพธ์ที่เป็น response
-    .catch((e) => e.response); // ส่งคืนข้อผิดพลาดที่เกิดขึ้น
+    .then((res) => res)
+    .catch((e) => e.response);
 }
 
 interface LoginData {
@@ -160,6 +160,25 @@ async function GetCourses() {
   return res;
 }
 
+async function GetCourseCategories() {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const res = await fetch(`${apiUrl}/categories`, requestOptions).then((res) => {
+    if (res.status === 200) {
+      return res.json();
+    } else {
+      throw new Error("Response is not in JSON format");
+    }
+  });
+
+  return res;
+}
+
 async function CreateCourse(data: CourseInterface) {
   const requestOptions = {
     method: "POST",
@@ -167,34 +186,46 @@ async function CreateCourse(data: CourseInterface) {
     body: JSON.stringify(data),
   };
 
-  const res = await fetch(`${apiUrl}/courses`, requestOptions).then((res) => {
-    if (res.status == 201) {
-      return res.json();
-    } else {
-      return false;
-    }
-  });
+  try {
+    const res = await fetch(`${apiUrl}/courses`, requestOptions);
+    console.log(data);
 
-  return res;
+    if (res.ok) { 
+      return await res.json();
+    } else {
+      const errorData = await res.json();
+      console.error('Error creating course:', errorData);
+      return { success: false, message: errorData.error || 'Unknown error' }; 
+    }
+  } catch (error) {
+    console.error('Network error:', error);
+    return { success: false, message: 'Network error occurred' };
+  }
 }
 
-async function UpdateCourse(data: CourseInterface) {
+async function UpdateCourse(id: number, data: CourseInterface) {
   const requestOptions = {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   };
 
-  const res = await fetch(`${apiUrl}/courses`, requestOptions).then((res) => {
-    if (res.status == 200) {
-      return res.json();
+  try {
+    const res = await fetch(`${apiUrl}/courses/${id}`, requestOptions);
+    
+    if (res.ok) {
+      return await res.json();
     } else {
-      return false;
+      const errorData = await res.json();
+      console.error('Error updating course:', errorData);
+      return false; // หรือคุณสามารถส่งคืนข้อความผิดพลาดที่ชัดเจนขึ้นได้
     }
-  });
-
-  return res;
+  } catch (error) {
+    console.error('Network error:', error);
+    return false;
+  }
 }
+
 
 async function GetCourseById(id: number) {
   const requestOptions = {
@@ -253,24 +284,48 @@ async function GetCourseByTutorID(tutorID: number) {
     }
   } catch (error) {
     console.error("Error fetching courses:", error);
-    return []; // คืนค่าที่เป็น Array แทน `false`
+    return [];
   }
 }
 
-async function DeleteCourse(id: number) {
+async function SearchCourseByKeyword(keyword: string){
   try {
-    const response = await fetch(`${apiUrl}/courses/${id}`, {
-      method: "DELETE",
+      const query = new URLSearchParams();
+      query.append("keyword", keyword);
+
+      const response = await fetch(`${apiUrl}/courses/search?${query.toString()}`, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+          },
+      });
+
+      if (response.status === 204) return [];
+      if (!response.ok) throw new Error('การตอบสนองของเครือข่ายไม่ถูกต้อง');
+      return await response.json();
+  } catch (error) {
+      console.error('ข้อผิดพลาดในการค้นหาคอร์สตามคำสำคัญ:', error);
+      return false;
+  }
+};
+
+
+
+async function DeleteCourseByID(id: number | undefined) {
+  const requestOptions = {
+    method: "DELETE"
+  };
+
+  const res = await fetch(`${apiUrl}/courses/delete/${id}`, requestOptions)
+    .then((res) => {
+      if (res.status == 200) {
+        return true;
+      } else {
+        return false;
+      }
     });
 
-    if (response.ok) {
-      console.log("Course deleted successfully");
-    } else {
-      console.error("Failed to delete course");
-    }
-  } catch (error) {
-    console.error("Error:", error);
-  }
+  return res;
 }
 
 // Reviews By Tawun
@@ -344,7 +399,7 @@ export const GetReviewById = async (id: number): Promise<ReviewInterface[]> => {
 // ดึงรีวิวที่กรองตามเงื่อนไข
 export const GetFilteredReviews = async (starLevel: string, courseID?: number): Promise<ReviewInterface[] | false> => {
   try {
-      let query = new URLSearchParams();
+      const query = new URLSearchParams();
       query.append("starLevel", starLevel);
       if (courseID !== undefined) {
           query.append("courseID", courseID.toString());
@@ -369,7 +424,7 @@ export const GetFilteredReviews = async (starLevel: string, courseID?: number): 
 // ค้นหารีวิวตามคำสำคัญ
 export const SearchReviewsByKeyword = async (keyword: string, courseID: number): Promise<ReviewInterface[] | false> => {
   try {
-      let query = new URLSearchParams();
+      const query = new URLSearchParams();
       query.append("keyword", keyword);
       query.append("courseID", courseID.toString());
 
@@ -496,7 +551,7 @@ async function GetTotalCourse() {
     },
   };
 
-  let res = await fetch(`${apiUrl}/course-count`, requestOptions)
+  const res = await fetch(`${apiUrl}/course-count`, requestOptions)
     .then((res) => {
       if (res.status == 200) {
         return res.json();
@@ -624,15 +679,17 @@ export {
   GetTutorProfileById,
   //Course Pond
   GetCourses,
+  GetCourseCategories,
   CreateCourse,
   UpdateCourse,
   GetCourseById,
   GetCourseByCategoryID,
   GetCourseByTutorID,
-  DeleteCourse,
+  SearchCourseByKeyword,
+  DeleteCourseByID,
   //Admin Pai
   GetTotalCourse,
-  //Payment Max
+  //Payment Mac
   GetPaymentByIdUser, // ตะวันใช้ get ข้อมูลลง mycourse
   GetPayments,
   GetPriceById,

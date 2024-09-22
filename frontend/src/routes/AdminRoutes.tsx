@@ -17,6 +17,9 @@ const MainCourse = Loadable(lazy(() => import("../pages/Pond/Course/index")));
 const CourseDetails = Loadable(lazy(() => import("../pages/Pond/CourseDetail/index")));
 const MyCourses = Loadable(lazy(() => import("../pages/Pond/MyCourse/index")));
 const TutorCourse = Loadable(lazy(() => import("../pages/Pond/Tutor/index")));
+const CourseDetailsTutor = Loadable(lazy(() => import("../pages/Pond/Tutor/CourseDetail/index")));
+const EditCourse = Loadable(lazy(() => import("../pages/Pond/Tutor/Edit/index")));
+const CreateCourse = Loadable(lazy(() => import("../pages/Pond/Tutor/Create/index")));
 const SearchCourse = Loadable(lazy(() => import("../pages/Pond/Search/index")));
 
 //Admin
@@ -31,25 +34,25 @@ const MainPayment = Loadable(lazy(() => import("../pages/Payment/index")));
 
 const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
   const userRoleId = parseInt(localStorage.getItem("user_role_id") || "0", 10);
-  const id = localStorage.getItem('id') || 'Unknown User';
+  //const id = localStorage.getItem('id') || 'Unknown User';
 
   return {
     path: "/",
-    element: <MinimalLayout />, // ใช้ MinimalLayout เป็น Wrapper
+    element: <MinimalLayout />, 
     children: [
       {
         path: "/", 
         element: isLoggedIn 
-          ? (userRoleId === 3 
+          ? (userRoleId === 1 
               ? <MainDashboard />  
-              : (userRoleId === 2 || userRoleId === 1) 
+              : (userRoleId === 2 || userRoleId === 3) 
               ? <MainCourse /> 
               : <MainPages />) 
-          : <MainPages />,  
+          : <MainPages />, 
       },
       {
         path: "/dashboard",
-        element: isLoggedIn ? (userRoleId === 3 ? <MainDashboard /> : <MainDashboard />) : <MainPages />,
+        element: isLoggedIn ? (userRoleId ===  1? <MainDashboard /> : <MainCourse />) : <MainPages />,
       },
       { // ปาย
         path: "tutorAdmin", 
@@ -73,7 +76,7 @@ const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
       },
       { // ปอน
         path: "tutor", 
-        element: isLoggedIn ? <TutorCourse /> : <MainPages />,
+        element: isLoggedIn ? (userRoleId === 2  ? <TutorCourse /> : <MainPages />) : <MainPages />,
       },
       { // ปอน
         path: "search", 
@@ -82,6 +85,18 @@ const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
       { // ปอน
         path: "course", 
         element: isLoggedIn ? <MainCourse /> : <MainPages />,
+      },
+      { // ปอน
+        path: "tutor/:id", 
+        element: isLoggedIn ? <CourseDetailsTutor /> : <MainPages />,
+      },
+      { // ปอน
+        path: "tutor/edit/:id", 
+        element: isLoggedIn ? <EditCourse /> : <MainPages />,
+      },
+      { // ปอน
+        path: "tutor/create", 
+        element: isLoggedIn ? <CreateCourse /> : <MainPages />,
       },
       { // ปอน
         path: "course/:id", // เส้นทางสำหรับ CourseDetail
@@ -118,4 +133,3 @@ const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
 };
 
 export default AdminRoutes;
-

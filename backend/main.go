@@ -7,6 +7,7 @@ import (
 	"github.com/Parichatx/user-system2/controller/payment"
 	"github.com/Parichatx/user-system2/controller/task"
 	"github.com/Parichatx/user-system2/controller/course"
+	"github.com/Parichatx/user-system2/controller/course_category"
 	"github.com/Parichatx/user-system2/controller/like"
 	"github.com/Parichatx/user-system2/controller/review"
 	"github.com/Parichatx/user-system2/controller/tutor_profiles"
@@ -40,16 +41,20 @@ func main() {
 		r.GET("/users", users.GetAll)
 		r.GET("/users/:id", users.GetUserById)
 		r.DELETE("/users/:id", users.Delete)
-		r.GET("/tutor_profiles/:userID", tutor_profiles.GetTutorProfile) 
+		r.GET("/tutor_profiles/:id", tutor_profiles.GetTutorProfileByUserID) 
 
 		// Course Routes By Pond
 		router.GET("/courses", course.ListCourse)
 		router.GET("/courses/:id", course.GetCourse)
 		router.GET("/courses/category/:id", course.GetCourseByCategoryID)
-		router.GET("/tutor/:id", course.GetCourseByCategoryID)
+		router.GET("/tutor/:id", course.GetCourseByTutorID)
+		router.GET("/courses/search", course.SearchCourseByKeyword)
 		router.POST("/courses", course.CreateCourse)
-		router.PUT("/courses/:id", course.UpdateCourse)
-		router.DELETE("/courses/:id", course.DeleteCourse)
+		router.PATCH("/courses/:id", course.UpdateCourse)
+		router.DELETE("/courses/delete/:id", course.DeleteCourse)
+
+		// Category Routes By Pond
+		router.GET("/categories", CourseCategories.ListCourse_Category)
 
 		//Review By Tawun
 		router.GET("/user/:id", reviews.GetUserByIdReviews) 
@@ -72,7 +77,7 @@ func main() {
 		router.GET("/course", course.ListCourse)
         router.GET("/course-count", course.CountCourses)
 
-		//Payment By Max
+		//Payment By Mac
 		r.GET("/payments/user/:userID", payment.GetPaymentByIdUser) // ตะวันใช้เรียกดู user in MyCourse 
 		router.GET("/payments", payment.ListAllPayments)
 		router.GET("/course-price/:id", payment.GetCoursePrice)
@@ -103,7 +108,7 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, PATCH, DELETE")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
