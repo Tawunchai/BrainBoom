@@ -4,9 +4,11 @@ import axios from "axios";
 import { CourseInterface } from "../../interfaces/ICourse";
 import { ReviewInterface } from "../../interfaces/IReview";
 import { PaymentsInterface } from "../../interfaces/IPayment";
+import { Tutor as TutorInterface } from "../../interfaces/Tutor";
 
 const apiUrl = "http://localhost:8000";
 
+// Eye
 // ฟังก์ชันสำหรับการสร้าง Authorization Header
 const getAuthHeader = () => {
   const token = localStorage.getItem("token"); // ดึง token จาก localStorage
@@ -18,16 +20,24 @@ const getAuthHeader = () => {
 async function SignIn(data: SignInInterface) {
   return await axios
     .post(`${apiUrl}/signin`, data)
-    .then((res) => {
+    .then(async (res) => {
       // เมื่อผู้ใช้ล็อกอินสำเร็จ เก็บ token ใน localStorage
       const token = res.data.token;
       const tokenType = res.data.token_type || "Bearer";
       localStorage.setItem("token", token);
       localStorage.setItem("token_type", tokenType);
+
+      // ดึง user ID จาก response
+      //const userId = res.data.userId; // สมมุติว่า response มี userId
+
+      // บันทึก login history
+      //await AddLoginHistory(userId);
+
       return res;
     })
     .catch((e) => e.response);
 }
+
 
 // ฟังก์ชันสำหรับการจัดการผู้ใช้
 
@@ -97,12 +107,9 @@ async function CreateUser(data: UsersInterface) {
 }
 
 // อัปเดตพาสเวิร์ด
-async function UpdatePasswordById(
-  id: string,
-  payload: { current_password: string; new_password: string }
-) {
+async function UpdatePasswordById(id: string, data: { old_password: string; new_password: string; confirm_password: string }) {
   return await axios
-    .put(`${apiUrl}/users/${id}/update-password`, payload, {
+    .put(`${apiUrl}/users/password/${id}`, data, {
       headers: {
         "Content-Type": "application/json",
         Authorization: getAuthHeader(), // ส่ง Authorization Header ในคำขอ
@@ -112,18 +119,45 @@ async function UpdatePasswordById(
     .catch((e) => e.response);
 }
 
-// ดึงข้อมูลโปรไฟล์ของ tutor ตาม ID
-async function GetTutorProfileById(UserID: number) {
+
+async function GetTutors() {
   return await axios
-    .get(`${apiUrl}/tutor_profiles/${UserID}`, {
+    .get(`${apiUrl}/tutor_profiles`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: getAuthHeader(),
+        Authorization: getAuthHeader(), // ส่ง Authorization Header ในคำขอ
       },
     })
     .then((res) => res)
     .catch((e) => e.response);
 }
+
+async function GetTutorProfileByUserId(UserID: string) {
+  return await axios
+    .get(`${apiUrl}/tutor_profiles/${UserID}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getAuthHeader(), // ส่ง Authorization Header ในคำขอ
+      },
+    })
+    .then((res) => res)
+    .catch((e) => e.response);
+}
+
+// อัปเดตข้อมูลตาม ID
+async function UpdateTutorById(UserID: string, data: TutorInterface) {
+  return await axios
+    .put(`${apiUrl}/tutor_profiles/${UserID}`, data, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getAuthHeader(), // ส่ง Authorization Header ในคำขอ
+      },
+    })
+    .then((res) => res)
+    .catch((e) => e.response);
+}
+
+
 
 interface LoginData {
   username: string;
@@ -139,6 +173,38 @@ const loginService = async (data: LoginData): Promise<LoginResponse> => {
   const response = await axios.post("/api/login", data);
   return response.data;
 };
+
+//History
+
+async function GetLoginHistory(userId: number) {
+  return await axios
+    .get(`${apiUrl}/login-history/${userId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getAuthHeader(),
+      },
+    })
+    .then((res) => res.data)
+    .catch((e) => e.response);
+}
+
+async function AddLoginHistory(userId: number) {
+  const data = {
+    userId,
+    LoginTimeStamp: new Date().toISOString(),
+    
+  };
+
+  return await axios
+    .post(`${apiUrl}/login-history`, data, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getAuthHeader(),
+      },
+    })
+    .then((res) => res.data)
+    .catch((e) => e.response);
+}
 
 //Pond
 async function GetCourses() {
@@ -286,6 +352,19 @@ async function GetCourseByTutorID(tutorID: number) {
     console.error("Error fetching courses:", error);
     return [];
   }
+}
+
+// ดึงข้อมูลโปรไฟล์ของ tutor ตาม ID
+async function GetTutorProfileById(UserID: number) {
+  return await axios
+    .get(`${apiUrl}/tutor_profiles/${UserID}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getAuthHeader(),
+      },
+    })
+    .then((res) => res)
+    .catch((e) => e.response);
 }
 
 async function SearchCourseByKeyword(keyword: string){
@@ -609,7 +688,7 @@ async function GetPayments() {
 
   return res;
 }
-GetTutorProfileById
+
 async function GetPriceById(id: number | undefined) {
   const requestOptions = {
     method: "GET",
@@ -676,8 +755,13 @@ export {
   CreateUser,
   UpdatePasswordById,
   loginService,
-  GetTutorProfileById,
+  GetTutorProfileByUserId,
+  GetTutors,
+  UpdateTutorById,
+  GetLoginHistory,
+  AddLoginHistory,
   //Course Pond
+  GetTutorProfileById,
   GetCourses,
   GetCourseCategories,
   CreateCourse,

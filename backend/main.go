@@ -11,6 +11,7 @@ import (
 	"github.com/Parichatx/user-system2/controller/like"
 	"github.com/Parichatx/user-system2/controller/review"
 	"github.com/Parichatx/user-system2/controller/tutor_profiles"
+	"github.com/Parichatx/user-system2/controller/login_history"
 	"github.com/Parichatx/user-system2/controller/users"
 	//"github.com/Parichatx/user-system2/middlewares"
 	"github.com/gin-gonic/gin"
@@ -41,7 +42,16 @@ func main() {
 		r.GET("/users", users.GetAll)
 		r.GET("/users/:id", users.GetUserById)
 		r.DELETE("/users/:id", users.Delete)
-		r.GET("/tutor_profiles/:id", tutor_profiles.GetTutorProfileByUserID) 
+		r.PUT("/users/password/:id", users.ChangePassword)
+
+		r.POST("/tutor_profiles", tutor_profiles.CreateTutorProfile)  
+		r.GET("/tutor_profiles/:UserID", tutor_profiles.GetTutorProfileByUserID)  
+		r.PUT("/tutor_profiles/:UserID", tutor_profiles.UpdateTutorProfile)  
+		
+		r.POST("/login-history", login_history.CreateLoginHistory)
+    	r.GET("/login-history/:id", login_history.GetLoginHistory)
+    	r.GET("/login-history/user/:user_id", login_history.ListUserLoginHistory)
+    	r.DELETE("/login-history/:id", login_history.DeleteLoginHistory)
 
 		// Course Routes By Pond
 		router.GET("/courses", course.ListCourse)

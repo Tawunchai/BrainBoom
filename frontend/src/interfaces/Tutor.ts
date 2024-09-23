@@ -1,18 +1,31 @@
 
 
+export interface Tutor {
+  
+  ID?: number;
+
+  Education?: string;
+
+  Experience?: string;
+
+  Bio?: string;
+
+  UserID?: number;
+  
+}
+
 export interface TutorInterface {
 
-    ID: number;
+  ID: number;
 
-    Education?: string;
+  Education?: string;
 
-    Experience?: string;
+  Experience?: string;
 
-    Bio?: string;
+  Bio?: string;
 
-    ProfilePicture: string;
+  ProfilePicture: string;
 
-    UserID: number;
-    
-  }
+  UserID: number;
   
+}

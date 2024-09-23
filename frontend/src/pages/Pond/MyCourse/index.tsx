@@ -3,7 +3,7 @@ import HeaderComponent from "../../../components/header";
 //import { Link } from "react-router-dom";
 import Modal from "./CreateReview/Pop_Up";
 import { GetReviewById, GetPaymentByIdUser } from "../../../services/https";
-import { message } from "antd";
+import { Card, message } from "antd";
 import { PaymentsReviewInterface } from "../../../interfaces/IPayment";
 import "./popup.css";
 
@@ -65,19 +65,14 @@ const Review: React.FC = () => {
       <br />
       <br />
       <br />
+      <div className="header-course">MyCourse</div>
       <div className="setcourse">
         <div className="review-layer">
           {payments.map((payment, index) => (
-            <div key={index} className="product-review">
+            <Card key={index} className="product-review">
               <img
                 src={payment.Course.ProfilePicture}
                 alt={`${payment.Course.Title} Course`}
-                style={{
-                  width: "220px",
-                  height: "220px",
-                  borderRadius: "15px",
-                  objectFit: "cover",
-                }}
               />
 
               <p className="text-product">
@@ -116,7 +111,7 @@ const Review: React.FC = () => {
                   )}
                 </div>
               </p>
-            </div>
+            </Card>
           ))}
         </div>
       </div>

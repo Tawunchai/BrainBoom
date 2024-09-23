@@ -115,19 +115,25 @@ const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
             element: isLoggedIn ? <EditUser /> : <MainPages />,
           },
           {
-            path: "changepassword/:id", // อาย
+            path: "password/:id", // อาย
             element: isLoggedIn ? <ChangePassword /> : <MainPages />,
           },
         ],
       },
-      {
-        path: "tutor_profiles/users/:userID", // อาย
-        element: isLoggedIn ? <MyProfile /> : <MainPages />,
+      { // อาย
+        path: "tutor_profiles", 
+        element: isLoggedIn ? (userRoleId === 2 ? <MyProfile /> : <ProfileUser />) : <MainPages />,
+        children: [
+          {
+            path: "users/:UserID",  // อาย
+            element: isLoggedIn ? <MyProfile /> : <MainPages />,
+          },
+          {
+            path: "edit/:UserID", // อาย
+            element: isLoggedIn ? <EditTutor /> : <MainPages />,
+          },
+        ],
       },
-      {
-        path: "tutor_profiles/edit/:userID", // อาย
-        element: isLoggedIn ? <EditTutor /> : <MainPages />,
-      }
     ],
   };
 };
