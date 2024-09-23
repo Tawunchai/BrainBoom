@@ -226,6 +226,44 @@ async function GetCourses() {
   return res;
 }
 
+async function GetCoursesByPriceASC() {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const res = await fetch(`${apiUrl}/courses/price/asc`, requestOptions).then((res) => {
+    if (res.status === 200) {
+      return res.json();
+    } else {
+      throw new Error("Response is not in JSON format");
+    }
+  });
+
+  return res;
+}
+
+async function GetCoursesByPriceDESC() {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const res = await fetch(`${apiUrl}/courses/price/desc`, requestOptions).then((res) => {
+    if (res.status === 200) {
+      return res.json();
+    } else {
+      throw new Error("Response is not in JSON format");
+    }
+  });
+
+  return res;
+}
+
 async function GetCourseCategories() {
   const requestOptions = {
     method: "GET",
@@ -311,20 +349,26 @@ async function GetCourseById(id: number) {
   return res;
 }
 
-async function GetCourseByCategoryID(categoryID: number) {
-  try {
-    const response = await fetch(`/courses/category/${categoryID}`);
-    if (!response.ok) throw new Error("การตอบสนองของเครือข่ายไม่ถูกต้อง");
+async function GetCourseByCategoryID(id: number): Promise<CourseInterface[]> {
+  const requestOptions = {
+    method: "GET",
+  };
 
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-      return await response.json();
+  try {
+    const res = await fetch(`${apiUrl}/courses/category/${id}`, requestOptions);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        return data;
+      } else {
+        return [];
+      }
     } else {
-      throw new Error("การตอบสนองไม่ใช่ JSON");
+      return []; 
     }
-  } catch (error) {
-    console.error("ข้อผิดพลาดในการดึงข้อมูลคอร์ส:", error);
-    return false;
+  } catch {
+    return [];
   }
 }
 
@@ -387,8 +431,6 @@ async function SearchCourseByKeyword(keyword: string){
       return false;
   }
 };
-
-
 
 async function DeleteCourseByID(id: number | undefined) {
   const requestOptions = {
@@ -670,6 +712,34 @@ async function GetPaymentByIdUser(userID: number): Promise<any> {
   }
 }
 
+async function GetPaymentByIdCourse(courseID: number): Promise<PaymentsInterface[] | null | false> {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  try {
+    const res = await fetch(`${apiUrl}/payments/courses/${courseID}`, requestOptions);
+    if (res.status === 200) {
+      const payments = await res.json();
+    
+      if (Array.isArray(payments)) {
+        return payments as PaymentsInterface[]; 
+      } else {
+        return false;
+      }
+    } else if (res.status === 404) {
+      return null;
+    } else {
+      return false;
+    }
+  } catch {
+    return false;
+  }
+}
+
 async function GetPayments() {
   const requestOptions = {
     method: "GET",
@@ -760,9 +830,11 @@ export {
   UpdateTutorById,
   GetLoginHistory,
   AddLoginHistory,
-  //Course Pond
   GetTutorProfileById,
+  //Course Pond
   GetCourses,
+  GetCoursesByPriceASC,
+  GetCoursesByPriceDESC,
   GetCourseCategories,
   CreateCourse,
   UpdateCourse,
@@ -775,6 +847,7 @@ export {
   GetTotalCourse,
   //Payment Mac
   GetPaymentByIdUser, // ตะวันใช้ get ข้อมูลลง mycourse
+  GetPaymentByIdCourse,
   GetPayments,
   GetPriceById,
   GetTitleById,
