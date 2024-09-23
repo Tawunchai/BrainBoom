@@ -74,7 +74,6 @@ const Review: React.FC = () => {
                 src={payment.Course.ProfilePicture}
                 alt={`${payment.Course.Title} Course`}
               />
-
               <p className="text-product">
                 <strong>Name : {payment.Course.Title}</strong>
                 <br />
