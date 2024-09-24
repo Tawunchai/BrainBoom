@@ -1,29 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, Button, message, Upload } from "antd";
 import ReactDOM from "react-dom";
 import { ReviewInterface } from "../../../../interfaces/IReview";
-import { CreateReview } from "../../../../services/https";
+import { UpdateReview, GetReviewsByID } from "../../../../services/https"; // ใช้ UpdateReview
 import { useNavigate } from "react-router-dom";
 import StarRating from "../../../../Feature/Star";
 import "../popup.css";
 import { PlusOutlined } from "@ant-design/icons";
 import ImgCrop from "antd-img-crop";
-import type { GetProp, UploadFile, UploadProps } from "antd";
+import type { UploadFile, UploadProps } from "antd";
 
 interface ModalProps {
   open: boolean;
   onClose: () => void;
   CourseID: number;
   UserID: number;
-  onReviewSubmit: (courseId: number) => void; // ฟังก์ชันที่เรียกเมื่อรีวิวเสร็จ
+  onReviewSubmit: (courseId: number) => void; // ฟังก์ชันที่จะเรียกเมื่อรีวิวถูกส่ง
+  reviewId: number; // ส่ง ID ของรีวิวที่มีอยู่
 }
 
-const ModalCreate: React.FC<ModalProps> = ({
+const ModalEdit: React.FC<ModalProps> = ({
   open,
   onClose,
   CourseID,
   UserID,
   onReviewSubmit,
+  reviewId, // รับ ID ของรีวิว
 }) => {
   if (!open) return null;
 
@@ -33,8 +35,7 @@ const ModalCreate: React.FC<ModalProps> = ({
   const [loading, setLoading] = React.useState(false);
   const [rating, setRating] = React.useState<number | undefined>(undefined);
   const [fileList, setFileList] = React.useState<UploadFile[]>([]);
-
-  type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
+  const [reviews, setReviews] = useState<ReviewInterface>();
 
   const onChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
     setFileList(newFileList);
@@ -45,7 +46,7 @@ const ModalCreate: React.FC<ModalProps> = ({
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
-        reader.readAsDataURL(file.originFileObj as FileType);
+        reader.readAsDataURL(file.originFileObj as File);
         reader.onload = () => resolve(reader.result as string);
       });
     }
@@ -59,7 +60,7 @@ const ModalCreate: React.FC<ModalProps> = ({
     if (rating === undefined || rating < 1) {
       messageApi.open({
         type: "error",
-        content: "Please rate the course!",
+        content: "กรุณาให้คะแนนหลักสูตร!",
       });
       return;
     }
@@ -68,7 +69,8 @@ const ModalCreate: React.FC<ModalProps> = ({
 
     setLoading(true);
     try {
-      const res = await CreateReview({
+      const res = await UpdateReview(reviewId, {
+        // ใช้ UpdateReview แทน CreateReview
         ...values,
         Rating: rating,
         CourseID: CourseID,
@@ -78,9 +80,9 @@ const ModalCreate: React.FC<ModalProps> = ({
       if (res) {
         messageApi.open({
           type: "success",
-          content: "Saved successfully",
+          content: "อัปเดตสำเร็จ",
         });
-        onReviewSubmit(CourseID); // อัปเดตสถานะการรีวิวทันทีหลังจากบันทึกสำเร็จ
+        onReviewSubmit(CourseID); // อัปเดตสถานะการรีวิวทันทีหลังจากบันทึก
         setTimeout(() => {
           onClose();
           navigate("/myCourses");
@@ -88,18 +90,44 @@ const ModalCreate: React.FC<ModalProps> = ({
       } else {
         messageApi.open({
           type: "error",
-          content: "Error saving the review!",
+          content: "เกิดข้อผิดพลาดในการอัปเดตรีวิว!",
         });
       }
     } catch (error) {
       messageApi.open({
         type: "error",
-        content: "An error occurred!",
+        content: "เกิดข้อผิดพลาด!",
       });
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const GetMemberid = async () => {
+      const res = await GetReviewsByID(reviewId);
+      if (res) {
+        setReviews(res.data);
+        form.setFieldsValue({
+          Rating: res.data.Rating,
+          Comment: res.data.Comment,
+        });
+        setRating(res.data.Rating); // ตั้งค่า rating ตามข้อมูลที่ดึงมา
+        if (res.data.Picture) {
+          setFileList([
+            {
+              uid: '-1',
+              name: 'profile.png', // หรือชื่อไฟล์ที่เหมาะสม
+              status: 'done',
+              url: res.data.Picture, // ใช้ URL ของรูปโปรไฟล์ที่มีอยู่
+            },
+          ]);
+        }
+      }
+    };
+    GetMemberid();
+  }, [reviewId, form]);
+  
 
   return ReactDOM.createPortal(
     <>
@@ -107,7 +135,7 @@ const ModalCreate: React.FC<ModalProps> = ({
       <div className="overlay" />
       <div className="modal">
         <div>
-          <p className="text">Review Course</p>
+          <p className="text">Edit Review</p>
           <Form
             form={form}
             name="reviewForm"
@@ -115,11 +143,11 @@ const ModalCreate: React.FC<ModalProps> = ({
             layout="vertical"
           >
             <Form.Item
-              label="รูปประจำตัว"
-              name="Profile"
+              label="รูปโปรไฟล์"
+              name="Picture"
               valuePropName="fileList"
             >
-              <ImgCrop rotationSlider>
+              <ImgCrop aspect={1} rotationSlider>
                 <Upload
                   fileList={fileList}
                   onChange={onChange}
@@ -134,7 +162,7 @@ const ModalCreate: React.FC<ModalProps> = ({
                 >
                   <div>
                     <PlusOutlined />
-                    <div style={{ marginTop: 8 }}>อัพโหลด</div>
+                    <div style={{ marginTop: 8 }}>อัปโหลด</div>
                   </div>
                 </Upload>
               </ImgCrop>
@@ -145,26 +173,18 @@ const ModalCreate: React.FC<ModalProps> = ({
             </Form.Item>
 
             <Form.Item
+              label="ความคิดเห็น"
               name="Comment"
-              label="Review"
-              rules={[{ required: true, message: "Please enter your review!" }]}
+              rules={[{ required: true, message: "กรุณากรอกความคิดเห็น!" }]}
             >
-              <Input.TextArea rows={4} style={{ width: "400px" }} />
+              <Input.TextArea rows={4} />
             </Form.Item>
-
-            <Form.Item className="box-button-reviews">
-              <Button type="default" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                style={{ marginLeft: "8px" }}
-                loading={loading}
-              >
-                Submit
-              </Button>
-            </Form.Item>
+            <Button className="button-close" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button loading={loading} type="primary" htmlType="submit">
+              Submit
+            </Button>
           </Form>
         </div>
       </div>
@@ -173,4 +193,4 @@ const ModalCreate: React.FC<ModalProps> = ({
   );
 };
 
-export default ModalCreate;
+export default ModalEdit;

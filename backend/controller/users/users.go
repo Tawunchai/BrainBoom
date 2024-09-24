@@ -4,7 +4,6 @@ import (
     "net/http"
     "github.com/gin-gonic/gin"
     "github.com/Parichatx/user-system2/config"
-    //"github.com/Parichatx/user-system2/config/config.go"
     "github.com/Parichatx/user-system2/entity"
     "github.com/go-playground/validator/v10"
     "golang.org/x/crypto/bcrypt"
@@ -150,4 +149,71 @@ func HashPassword(password string) (string, error) {
 func CheckPasswordHash(password string, hash []byte) bool {
 	err := bcrypt.CompareHashAndPassword(hash, []byte(password))
 	return err == nil
+}
+
+func GetUserForTutor(c *gin.Context) {
+	var users []entity.Users
+	db := config.DB()
+
+	// ดึงผู้ใช้ที่มี UserRole เป็น 
+	result := db.Where("user_role_id = ?", 2).Find(&users)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	count := len(users)                                          // นับจำนวนผู้ใช้
+	c.JSON(http.StatusOK, gin.H{"count": count, "users": users}) // คืนค่าจำนวนและข้อมูลผู้ใช้
+}
+
+func GetUserForStudent(c *gin.Context) {
+	var users []entity.Users
+	db := config.DB()
+
+	// ดึงผู้ใช้ที่มี UserRole เป็น 3
+	result := db.Where("user_role_id = ?", 3).Find(&users)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	count := len(users) // นับจำนวนผู้ใช้
+	c.JSON(http.StatusOK, gin.H{
+		"count": count,    // คืนค่าจำนวนผู้ใช้
+		"users": users,    // คืนค่าข้อมูลผู้ใช้
+	})
+}
+
+func CreateUserByAdmin(c *gin.Context) {
+    var user entity.Users
+
+    // ผูกข้อมูล JSON เข้ากับ struct user
+    if err := c.ShouldBindJSON(&user); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "ข้อมูลไม่ถูกต้อง"})
+        return
+    }
+
+    // ตรวจสอบข้อมูลผู้ใช้ที่ซ้ำซ้อน
+    db := config.DB()
+    var existingUser entity.Users
+    if err := db.Where("username = ?", user.Username).First(&existingUser).Error; err == nil {
+        c.JSON(http.StatusConflict, gin.H{"error": "ชื่อผู้ใช้มีอยู่แล้ว"})
+        return
+    }
+
+    // เข้ารหัสรหัสผ่านก่อนที่จะบันทึก
+    hashedPassword, err := config.HashPassword(user.Password)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "ไม่สามารถเข้ารหัสรหัสผ่านได้"})
+        return
+    }
+    user.Password = hashedPassword // ตั้งรหัสผ่านเป็นรหัสผ่านที่เข้ารหัสแล้ว
+
+    // สร้างผู้ใช้ในฐานข้อมูล
+    if err := db.Create(&user).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "ไม่สามารถสร้างผู้ใช้ได้"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "สร้างผู้ใช้สำเร็จ", "user": user})
 }

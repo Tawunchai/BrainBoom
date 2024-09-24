@@ -305,4 +305,55 @@ func GetCourseByPriceASC(c *gin.Context) {
 	c.JSON(http.StatusOK, courses)
 }
 
-// POST /payment
+//
+type LineData struct {
+	ID    string       `json:"id"`
+	Color string       `json:"color"`
+	Data  []DataPoints `json:"data"`
+}
+
+type DataPoints struct {
+	X string  `json:"x"`
+	Y float64 `json:"y"`
+}
+
+// GET /courses/graph - Retrieve graph data from the database
+func GetGraphData(c *gin.Context) { // go
+	db := config.DB()
+
+	// สร้างโครงสร้างเก็บข้อมูล
+	var courses []entity.Courses
+	var graphData []LineData
+
+	// ดึงข้อมูลจากตาราง Courses
+	result := db.Find(&courses)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	// สร้างข้อมูลสำหรับกราฟ
+	// สร้าง LineData เพียงครั้งเดียว
+	lineData := LineData{
+		ID:    "Courses", // ID หรือหมวดหมู่ของกราฟ
+		Color: "#00FF00", // สีของกราฟ
+		Data:  []DataPoints{}, // สร้าง DataPoints เป็นอาร์เรย์ว่าง
+	}
+
+	for _, course := range courses {
+		// ประยุกต์ให้ Data Points เป็นชื่อคอร์ส และราคาเป็น Y
+		dataPoint := DataPoints{
+			X: course.Title,              // ใช้ Title เป็นแกน X
+			Y: float64(course.Price),     // ใช้ Price เป็นแกน Y
+		}
+
+		// เพิ่มข้อมูล DataPoint ลงใน Data ของ LineData
+		lineData.Data = append(lineData.Data, dataPoint)
+	}
+
+	// เพิ่ม LineData ลงใน graphData
+	graphData = append(graphData, lineData)
+
+	// ส่งข้อมูลกราฟกลับไป
+	c.JSON(http.StatusOK, graphData)
+}

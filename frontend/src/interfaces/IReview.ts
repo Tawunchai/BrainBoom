@@ -7,4 +7,3 @@ export interface ReviewInterface {
     CourseID?: number;
     Picture?: string;
   }
-  

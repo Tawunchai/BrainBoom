@@ -8,6 +8,22 @@ import { Tutor as TutorInterface } from "../../interfaces/Tutor";
 
 const apiUrl = "http://localhost:8000";
 
+const Authorization = localStorage.getItem("token");
+
+const Bearer = localStorage.getItem("token_type");
+
+const requestOptions = {
+
+  headers: {
+
+    "Content-Type": "application/json",
+
+    Authorization:`${Bearer} ${Authorization}`,
+
+  },
+
+};
+
 // Eye
 // ฟังก์ชันสำหรับการสร้าง Authorization Header
 const getAuthHeader = () => {
@@ -178,7 +194,7 @@ const loginService = async (data: LoginData): Promise<LoginResponse> => {
 
 async function GetLoginHistory(userId: number) {
   return await axios
-    .get(`${apiUrl}/login-history/${userId}`, {
+    .get(`${apiUrl}/loginhistory/${userId}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: getAuthHeader(),
@@ -196,7 +212,7 @@ async function AddLoginHistory(userId: number) {
   };
 
   return await axios
-    .post(`${apiUrl}/login-history`, data, {
+    .post(`${apiUrl}/loginhistory`, data, {
       headers: {
         "Content-Type": "application/json",
         Authorization: getAuthHeader(),
@@ -204,6 +220,16 @@ async function AddLoginHistory(userId: number) {
     })
     .then((res) => res.data)
     .catch((e) => e.response);
+}
+
+async function GetLoginHistoryByUserId(UserID: string) {
+  try {
+    const response = await axios.get(`${apiUrl}/loginhistory/users/${UserID}`); // แก้ไขเส้นทางให้ตรงกับ backend
+    return response.data; // ส่งคืนเฉพาะข้อมูลที่อยู่ใน response.data
+  } catch (error) {
+    console.error("Error fetching login history:", error);
+    throw error;
+  }
 }
 
 //Pond
@@ -483,6 +509,35 @@ export const CreateReview = async (data: ReviewInterface): Promise<ReviewInterfa
   }
 };
 
+async function GetReviewsByID(id: number) { // edit
+
+  return await axios
+
+    .get(`${apiUrl}/review/${id}`, requestOptions)
+
+    .then((res) => res)
+
+    .catch((e) => e.response);
+
+}
+
+//update
+export const UpdateReview = async (id: number, data: ReviewInterface): Promise<ReviewInterface | false> => {
+  try {
+    const response = await fetch(`${apiUrl}/reviews/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (response.status !== 200) throw new Error('การตอบสนองของเครือข่ายไม่ถูกต้อง');
+    return await response.json();
+  } catch (error) {
+    console.error('ข้อผิดพลาดในการอัปเดตรีวิว:', error);
+    return false;
+  }
+};
+
 // รายการรีวิวทั้งหมด
 export const ListReview = async (): Promise<ReviewInterface[] | false> => {
   try {
@@ -684,6 +739,112 @@ async function GetTotalCourse() {
   return res;
 }
 
+async function GetTotalTutor() {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const res = await fetch(`${apiUrl}/tutor-count`, requestOptions) // เปลี่ยนเป็น endpoint สำหรับนับ Tutor
+    .then((res) => {
+      if (res.status === 200) {
+        return res.json(); // คืนค่าข้อมูล JSON ถ้าสถานะเป็น 200
+      } else {
+        return false; // คืนค่า false ถ้าเกิดข้อผิดพลาด
+      }
+    });
+
+  return res; // คืนค่าผลลัพธ์ที่ได้
+}
+async function GetTotalStudent() {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const res = await fetch(`${apiUrl}/student-count`, requestOptions) // เปลี่ยนเป็น endpoint สำหรับนับ Tutor
+    .then((res) => {
+      if (res.status === 200) {
+        return res.json(); // คืนค่าข้อมูล JSON ถ้าสถานะเป็น 200
+      } else {
+        return false; // คืนค่า false ถ้าเกิดข้อผิดพลาด
+      }
+    });
+
+  return res; // คืนค่าผลลัพธ์ที่ได้
+}
+async function GetTotalPaid() {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const res = await fetch(`${apiUrl}/total-paid`, requestOptions).then((res) => {
+    if (res.status == 200) {
+      return res.json();
+    } else {
+      return false;
+    }
+  });
+
+  return res;
+}
+async function GetRecentTransactions() {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const res = await fetch(`${apiUrl}/recent-paid`, requestOptions).then((res) => {
+    if (res.status == 200) {
+      return res.json();
+    } else {
+      return false;
+    }
+  });
+
+  return res;
+}
+
+async function GetDataGraph() {
+  const requestOptions = {
+    method: "GET",
+  };
+
+  const res = await fetch(`${apiUrl}/courses-graph`, requestOptions).then(
+    (res) => {
+      if (res.status == 200) {
+        return res.json();
+      } else {
+        return false;
+      }
+    }
+  );
+
+  return res;
+}
+
+
+async function CreateUserByAdmin(data: UsersInterface) {
+  return await axios
+    .post(`${apiUrl}/create-user`, data, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getAuthHeader(), // ส่ง Authorization Header ในคำขอ
+      },
+    })
+    .then((res) => res)
+    .catch((e) => e.response);
+}
+
 // Payment By Max ตะวันใช้ดึงข้อมูล user มารีวิว in MyCourse
 async function GetPaymentByIdUser(userID: number): Promise<any> {
   const requestOptions = {
@@ -831,6 +992,10 @@ export {
   GetLoginHistory,
   AddLoginHistory,
   GetTutorProfileById,
+  GetRecentTransactions,
+  GetLoginHistoryByUserId,
+  //Tawun
+  GetReviewsByID,
   //Course Pond
   GetCourses,
   GetCoursesByPriceASC,
@@ -845,6 +1010,11 @@ export {
   DeleteCourseByID,
   //Admin Pai
   GetTotalCourse,
+  GetTotalTutor,
+  GetTotalStudent,
+  GetTotalPaid,
+  GetDataGraph,
+  CreateUserByAdmin,
   //Payment Mac
   GetPaymentByIdUser, // ตะวันใช้ get ข้อมูลลง mycourse
   GetPaymentByIdCourse,

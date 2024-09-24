@@ -11,6 +11,7 @@ const ChangePassword = Loadable(lazy(() => import("../pages/User/changepassword"
 const TutorProfile = Loadable(lazy(() => import("../pages/TutorProfile")));
 const EditTutor = Loadable(lazy(() => import("../pages/TutorProfile/edit")));
 const MyProfile = Loadable(lazy(() => import("../pages/TutorProfile/myprofile")));
+const LoginHistory = Loadable(lazy(() => import("../pages/User/loginhistory")));
 
 //Course
 const MainCourse = Loadable(lazy(() => import("../pages/Pond/Course/index")));
@@ -118,16 +119,17 @@ const AdminRoutes = (isLoggedIn: boolean): RouteObject => {
             path: "password/:id", // อาย
             element: isLoggedIn ? <ChangePassword /> : <MainPages />,
           },
+          {
+            path: "loginhistory/:id", // อาย
+            element: isLoggedIn ? <LoginHistory /> : <MainPages />,
+          },
         ],
       },
       { // อาย
         path: "tutor_profiles", 
         element: isLoggedIn ? (userRoleId === 2 ? <MyProfile /> : <ProfileUser />) : <MainPages />,
         children: [
-          {
-            path: "users/:UserID",  // อาย
-            element: isLoggedIn ? <MyProfile /> : <MainPages />,
-          },
+
           {
             path: "edit/:UserID", // อาย
             element: isLoggedIn ? <EditTutor /> : <MainPages />,
