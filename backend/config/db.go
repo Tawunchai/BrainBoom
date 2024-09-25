@@ -64,7 +64,7 @@ func SetupDatabase() error {
 		&entity.Courses{},          // edit
 		&entity.CourseCategories{}, // edit
 		&entity.Reviews{},          // edit
-		&entity.Like{},             // edit
+		&entity.Likes{},             // edit
 		&entity.Tasks{},
 		&entity.Payments{},
 		&entity.LoginHistories{},
@@ -193,12 +193,12 @@ func SetupDatabase() error {
 	db.FirstOrCreate(Review1, &entity.Reviews{CourseID: &cid1})
 
 	rid := uint(1)
-	Like1 := &entity.Like{
+	Like1 := &entity.Likes{
 		UserID:   1,
 		ReviewID: &rid,
 	}
 
-	db.FirstOrCreate(Like1, &entity.Like{UserID: 1})
+	db.FirstOrCreate(Like1, &entity.Likes{UserID: 1})
 
 	// Create TutorProfile for the user
 	TutorProfile := &entity.TutorProfiles{
