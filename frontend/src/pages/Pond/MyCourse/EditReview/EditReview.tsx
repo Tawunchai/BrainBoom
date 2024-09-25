@@ -59,7 +59,7 @@ const ModalEdit: React.FC<ModalProps> = ({
   const onFinish = async (values: ReviewInterface) => {
     if (rating === undefined || rating < 1) {
       messageApi.open({
-        type: "error",
+        type: "warning",
         content: "กรุณาให้คะแนนหลักสูตร!",
       });
       return;
@@ -80,7 +80,7 @@ const ModalEdit: React.FC<ModalProps> = ({
       if (res) {
         messageApi.open({
           type: "success",
-          content: "อัปเดตสำเร็จ",
+          content: "เเก้ไขรีวิวสำเร็จ",
         });
         onReviewSubmit(CourseID); // อัปเดตสถานะการรีวิวทันทีหลังจากบันทึก
         setTimeout(() => {
@@ -90,7 +90,7 @@ const ModalEdit: React.FC<ModalProps> = ({
       } else {
         messageApi.open({
           type: "error",
-          content: "เกิดข้อผิดพลาดในการอัปเดตรีวิว!",
+          content: "เเก้ไขรีวิวไม่สำเร็จ!",
         });
       }
     } catch (error) {

@@ -47,6 +47,39 @@ func GetUserById(c *gin.Context) {
     c.JSON(http.StatusOK, user)
 }
 
+func GetUserByTutorId(c *gin.Context) {
+    ID := c.Param("id")
+    var user entity.Users
+    var tutor entity.TutorProfiles
+    db := config.DB()
+
+    tutorQuery := `SELECT * FROM tutor_profiles WHERE id = ? LIMIT 1`
+    result := db.Raw(tutorQuery, ID).Scan(&tutor)
+
+    if result.Error != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": result.Error.Error()})
+        return
+    }
+
+    userQuery := `SELECT * FROM users WHERE id = ? LIMIT 1`
+    result = db.Raw(userQuery, tutor.UserID).Scan(&user)
+
+    if result.Error != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": result.Error.Error()})
+        return
+    }
+
+    if user.ID == 0 {
+        c.JSON(http.StatusNoContent, gin.H{"message": "User not found"})
+        return
+    }
+
+    c.JSON(http.StatusOK, user)
+}
+
+
+
+
 func Update(c *gin.Context) {
     var user entity.Users
     UserID := c.Param("id")

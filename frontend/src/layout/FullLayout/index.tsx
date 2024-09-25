@@ -12,11 +12,6 @@ import logo from "../../assets/logo.png";
 
 import Dashboard from "../../pages/dashboard";
 
-import Customer from "../../pages/customer";
-
-import CustomerCreate from "../../pages/customer/create";
-
-import CustomerEdit from "../../pages/customer/edit";
 
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -211,12 +206,6 @@ const FullLayout: React.FC = () => {
             <Routes>
 
               <Route path="/" element={<Dashboard />} />
-
-              <Route path="/customer" element={<Customer />} />
-
-              <Route path="/customer/create" element={<CustomerCreate />} />
-
-              <Route path="/customer/edit/:id" element={<CustomerEdit />} />
 
             </Routes>
 

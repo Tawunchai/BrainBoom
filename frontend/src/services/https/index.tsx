@@ -5,6 +5,8 @@ import { CourseInterface } from "../../interfaces/ICourse";
 import { ReviewInterface } from "../../interfaces/IReview";
 import { PaymentsInterface } from "../../interfaces/IPayment";
 import { Tutor as TutorInterface } from "../../interfaces/Tutor";
+import { CreditCardInterface } from "../../interfaces/ICreditCard";
+import { PromptPayInterface } from "../../interfaces/IPromptpay";
 
 const apiUrl = "http://localhost:8000";
 
@@ -74,6 +76,18 @@ async function GetUsers() {
 async function GetUserById(id: string) {
   return await axios
     .get(`${apiUrl}/users/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getAuthHeader(), // ส่ง Authorization Header ในคำขอ
+      },
+    })
+    .then((res) => res)
+    .catch((e) => e.response);
+}
+
+async function GetUserByTutorId(id: string) {
+  return await axios
+    .get(`${apiUrl}/users/tutor/${id}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: getAuthHeader(), // ส่ง Authorization Header ในคำขอ
@@ -476,7 +490,7 @@ async function DeleteCourseByID(id: number | undefined) {
 }
 
 // Reviews By Tawun
-export const GetUserByIdReview = async (id: number | undefined): Promise<UsersInterface | false> => {
+const GetUserByIdReview = async (id: number | undefined): Promise<UsersInterface | false> => {
   try {
       if (id === undefined) return false;
 
@@ -493,7 +507,7 @@ export const GetUserByIdReview = async (id: number | undefined): Promise<UsersIn
 };
 
 // สร้างรีวิว
-export const CreateReview = async (data: ReviewInterface): Promise<ReviewInterface | false> => {
+const CreateReview = async (data: ReviewInterface): Promise<ReviewInterface | false> => {
   try {
       const response = await fetch(`${apiUrl}/reviews`, {
           method: "POST",
@@ -522,7 +536,7 @@ async function GetReviewsByID(id: number) { // edit
 }
 
 //update
-export const UpdateReview = async (id: number, data: ReviewInterface): Promise<ReviewInterface | false> => {
+const UpdateReview = async (id: number, data: ReviewInterface): Promise<ReviewInterface | false> => {
   try {
     const response = await fetch(`${apiUrl}/reviews/${id}`, {
       method: "PATCH",
@@ -539,7 +553,7 @@ export const UpdateReview = async (id: number, data: ReviewInterface): Promise<R
 };
 
 // รายการรีวิวทั้งหมด
-export const ListReview = async (): Promise<ReviewInterface[] | false> => {
+const ListReview = async (): Promise<ReviewInterface[] | false> => {
   try {
       const response = await fetch(`${apiUrl}/reviews`, {
           method: "GET",
@@ -557,7 +571,7 @@ export const ListReview = async (): Promise<ReviewInterface[] | false> => {
 };
 
 // ดึงรีวิวตาม ID
-export const GetReviewById = async (id: number): Promise<ReviewInterface[]> => {
+const GetReviewById = async (id: number): Promise<ReviewInterface[]> => {
   try {
       const response = await fetch(`${apiUrl}/reviews/course/${id}`, {
           method: "GET"
@@ -566,14 +580,13 @@ export const GetReviewById = async (id: number): Promise<ReviewInterface[]> => {
       if (!response.ok) throw new Error('การตอบสนองของเครือข่ายไม่ถูกต้อง');
       const data = await response.json();
       return Array.isArray(data) ? data : []; // ตรวจสอบให้แน่ใจว่าคืนค่าเป็นอาร์เรย์
-  } catch (error) {
-      console.error('ข้อผิดพลาดในการดึงรีวิวตาม ID:', error);
+  } catch {
       return [];
   }
 };
 
 // ดึงรีวิวที่กรองตามเงื่อนไข
-export const GetFilteredReviews = async (starLevel: string, courseID?: number): Promise<ReviewInterface[] | false> => {
+const GetFilteredReviews = async (starLevel: string, courseID?: number): Promise<ReviewInterface[] | false> => {
   try {
       const query = new URLSearchParams();
       query.append("starLevel", starLevel);
@@ -591,14 +604,13 @@ export const GetFilteredReviews = async (starLevel: string, courseID?: number): 
       if (response.status === 204) return [];
       if (!response.ok) throw new Error('การตอบสนองของเครือข่ายไม่ถูกต้อง');
       return await response.json();
-  } catch (error) {
-      console.error('ข้อผิดพลาดในการดึงรีวิวที่กรอง:', error);
+  } catch {
       return false;
   }
 };
 
 // ค้นหารีวิวตามคำสำคัญ
-export const SearchReviewsByKeyword = async (keyword: string, courseID: number): Promise<ReviewInterface[] | false> => {
+const SearchReviewsByKeyword = async (keyword: string, courseID: number): Promise<ReviewInterface[] | false> => {
   try {
       const query = new URLSearchParams();
       query.append("keyword", keyword);
@@ -621,7 +633,7 @@ export const SearchReviewsByKeyword = async (keyword: string, courseID: number):
 };
 
 // ดึงค่าเฉลี่ยของคะแนนรีวิวตาม ID ของหลักสูตร
-export const GetRatingsAvgByCourseID = async (courseID: number): Promise<{ rating: number; percentage: number }[] | false> => {
+const GetRatingsAvgByCourseID = async (courseID: number): Promise<{ rating: number; percentage: number }[] | false> => {
   try {
       const response = await fetch(`${apiUrl}/course/${courseID}/ratings`, {
           method: "GET",
@@ -656,7 +668,7 @@ export const GetRatingsAvgByCourseID = async (courseID: number): Promise<{ ratin
 };
 
 // ดึงรีวิวตาม ID ของหลักสูตร
-export const getReviewsByCourseID = async (courseID: number): Promise<ReviewInterface[] | false> => {
+const getReviewsByCourseID = async (courseID: number): Promise<ReviewInterface[] | false> => {
   try {
       const response = await fetch(`/api/reviews/course/${courseID}`);
       if (!response.ok) throw new Error('การตอบสนองของเครือข่ายไม่ถูกต้อง');
@@ -669,7 +681,7 @@ export const getReviewsByCourseID = async (courseID: number): Promise<ReviewInte
 
 
 // ฟังก์ชันสำหรับดึงข้อมูลสถานะไลค์
-export const fetchLikeStatus = async (reviewID: number, userID: number): Promise<{ hasLiked: boolean; likeCount: number } | false> => {
+const fetchLikeStatus = async (reviewID: number, userID: number): Promise<{ hasLiked: boolean; likeCount: number } | false> => {
   try {
       const response = await fetch(`${apiUrl}/reviews/${userID}/${reviewID}/like`);
       if (!response.ok) throw new Error('การตอบสนองของเครือข่ายไม่ถูกต้อง');
@@ -685,7 +697,7 @@ export const fetchLikeStatus = async (reviewID: number, userID: number): Promise
 };
 
 // ฟังก์ชันสำหรับกดไลค์
-export const onLikeButtonClick = async (reviewID: number, userID: number): Promise<any | false> => {
+const onLikeButtonClick = async (reviewID: number, userID: number): Promise<any | false> => {
   try {
       const response = await fetch(`${apiUrl}/reviews/like`, {
           method: "POST",
@@ -702,7 +714,7 @@ export const onLikeButtonClick = async (reviewID: number, userID: number): Promi
 };
 
 // ฟังก์ชันสำหรับยกเลิกไลค์
-export const onUnlikeButtonClick = async (reviewID: number, userID: number) => {
+const onUnlikeButtonClick = async (reviewID: number, userID: number) => {
   try {
       const response = await fetch(`${apiUrl}/reviews/unlike`, {
           method: "DELETE",
@@ -855,7 +867,10 @@ async function GetPaymentByIdUser(userID: number): Promise<any> {
   };
 
   try {
-    const res = await fetch(`${apiUrl}/payments/user/${userID}`, requestOptions);
+    const res = await fetch(
+      `${apiUrl}/payments/user/${userID}`,
+      requestOptions
+    );
 
     if (res.status === 200) {
       const payments = await res.json();
@@ -880,7 +895,7 @@ async function GetPaymentByIdCourse(courseID: number): Promise<PaymentsInterface
       "Content-Type": "application/json",
     },
   };
-
+  
   try {
     const res = await fetch(`${apiUrl}/payments/courses/${courseID}`, requestOptions);
     if (res.status === 200) {
@@ -956,6 +971,7 @@ async function GetTitleById(id: number | undefined) {
   return res;
 }
 
+
 async function CreatePayment(data: PaymentsInterface) {
   const requestOptions = {
     method: "POST",
@@ -974,6 +990,73 @@ async function CreatePayment(data: PaymentsInterface) {
   return res;
 }
 
+async function CreateCreditCard(data: CreditCardInterface) {
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  };
+
+  const res = await fetch(`${apiUrl}/credit-card`, requestOptions).then(
+    (res) => {
+      if (res) {
+        return res.json();
+      } else {
+        return null;
+      }
+    }
+  );
+
+  return res;
+}
+
+async function CreatePromptPay(data: PromptPayInterface) {
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  };
+
+  const res = await fetch(`${apiUrl}/prompt-pay`, requestOptions).then(
+    (res) => {
+      if (res) {
+        return res.json();
+      } else {
+        return null;
+      }
+    }
+  );
+
+  return res;
+}
+
+async function GetPaymentByIdCourseAndIdUser(courseID: number, userID: number): Promise<PaymentsInterface[] | null | false> {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  try {
+    const res = await fetch(`${apiUrl}/payments/courses/${courseID}/${userID}`, requestOptions);
+    if (res.status === 200) {
+      const payments = await res.json();
+    
+      if (Array.isArray(payments)) {
+        return payments as PaymentsInterface[]; 
+      } else {
+        return false;
+      }
+    } else if (res.status === 404) {
+      return null;
+    } else {
+      return false;
+    }
+  } catch {
+    return false;
+  }
+}
 
 // Export ฟังก์ชันทั้งหมด
 export {
@@ -981,6 +1064,7 @@ export {
   SignIn,
   GetUsers,
   GetUserById,
+  GetUserByTutorId,
   UpdateUserById,
   DeleteUserById,
   CreateUser,
@@ -996,6 +1080,17 @@ export {
   GetLoginHistoryByUserId,
   //Tawun
   GetReviewsByID,
+  GetUserByIdReview,
+  CreateReview,
+  UpdateReview,
+  ListReview,
+  GetReviewById,
+  GetFilteredReviews,
+  SearchReviewsByKeyword,
+  GetRatingsAvgByCourseID,
+  getReviewsByCourseID,
+  fetchLikeStatus,
+  onLikeButtonClick,
   //Course Pond
   GetCourses,
   GetCoursesByPriceASC,
@@ -1008,6 +1103,7 @@ export {
   GetCourseByTutorID,
   SearchCourseByKeyword,
   DeleteCourseByID,
+  onUnlikeButtonClick,
   //Admin Pai
   GetTotalCourse,
   GetTotalTutor,
@@ -1017,9 +1113,12 @@ export {
   CreateUserByAdmin,
   //Payment Mac
   GetPaymentByIdUser, // ตะวันใช้ get ข้อมูลลง mycourse
-  GetPaymentByIdCourse,
   GetPayments,
   GetPriceById,
   GetTitleById,
   CreatePayment,
+  CreateCreditCard,
+  CreatePromptPay,
+  GetPaymentByIdCourseAndIdUser,
+  GetPaymentByIdCourse,
 };

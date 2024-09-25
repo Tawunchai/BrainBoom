@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, Button, Typography, Divider } from 'antd';
 import { useNavigate, useLocation  } from 'react-router-dom';
 import HeaderComponent from '../../../components/header';
 import moment from 'moment';
 import Example_Review from './Model/Example_Review';
 import ModalTest from "./Model/Model"; 
+import { GetPaymentByIdCourseAndIdUser, GetUserByTutorId } from '../../../services/https';
+import { UsersInterface } from '../../../interfaces/IUser';
 
 const { Title, Text } = Typography;
 
@@ -12,16 +14,61 @@ function CourseDetail() {
   const navigate = useNavigate();
   const location = useLocation();
   const course = location.state?.course;
-  console.log(course.ID);
+  const userID = Number(localStorage.getItem('id')) || 0;
+  const [cheackPayments, setCheackPayments] = useState<number>();
+
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const updatedAt = course.UpdatedAt;
   const formattedDate = moment(updatedAt).format('DD MMMM YYYY');
   const formattedTime = moment(updatedAt).format('HH:mm');
 
+  const [user, setUser] = useState<UsersInterface>();
+
   const showModal = () => {
       setIsModalVisible(true);
   };
+
+  const CheackPayment = async (courseID: number) => {
+    try {
+      const paymentsData = await GetPaymentByIdCourseAndIdUser(courseID, userID);
+      
+      if (paymentsData && Array.isArray(paymentsData)) {
+        setCheackPayments(1);
+      } else {
+        setCheackPayments(0);
+      }
+    } catch (error) {
+      console.error(`Error fetching payments for course ${courseID}:`, error);
+    }
+  };
+  
+  useEffect(() => {
+    if (course.ID) {
+      CheackPayment(course.ID); 
+    }
+  });
+
+  const getUser = async (tutorProfileID: string) => {
+    try {
+        const UserData = await GetUserByTutorId(tutorProfileID);
+        setUser(UserData.data);
+    } catch (error) {
+        console.error(`Unknown User`, error);
+    }
+};
+  
+
+useEffect(() => {
+  
+  if (!user) {
+      const tutorProfileID = course.TutorProfileID;
+      if (tutorProfileID !== undefined) {
+          getUser(tutorProfileID.toString());
+      }
+  }
+}, [course, user]);
+  
 
   
   const handleCourseClick = () => {
@@ -78,7 +125,7 @@ function CourseDetail() {
                       borderRadius: '10px',
                       objectFit: 'cover',
                       width: '100%',
-                      height: '300px',
+                      height: '250px',
                       padding: '10px',
                     }}
                   />
@@ -92,7 +139,7 @@ function CourseDetail() {
                 }}
                 styles={{body: { padding: '10px 25px' }}}
               >
-                <Text type="secondary">Created by: {course.TutorProfileID || "Unknown"}</Text>
+                <Text type="secondary">Created by: {user?.Username|| "Unknown"}</Text>
                 <br />
                 <Text type="secondary">Updated: {formattedDate} {formattedTime || "N/A"}</Text>
               </Card>
@@ -116,29 +163,46 @@ function CourseDetail() {
               >
                 {course.Price?.toFixed(2) || "0.00"} Bath
               </Text>
-              <div key={course.ID} onClick={() => handleCourseClick()}>
-              <Button
-                type="primary"
-                style={{
-                  borderRadius: '25px',
-                  marginTop: '10px',
-                  backgroundColor: '#003459',
-                  borderColor: '#003459',
-                  transition: 'background-color 0.3s, border-color 0.3s',
-                }}
-                //onClick={() => navigate('/payment')}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#002a3d';
-                  e.currentTarget.style.borderColor = '#002a3d';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#003459';
-                  e.currentTarget.style.borderColor = '#003459';
-                }}
-              >
-                ซื้อเลย
-              </Button>
-              </div>
+              { cheackPayments === 1 ? (
+                <div key={course.ID}>
+                  <Button
+                    type="primary"
+                    style={{
+                      borderRadius: '25px',
+                      marginTop: '10px',
+                      backgroundColor: '#696969',
+                      borderColor: '#696969',
+                    }}
+                  >
+                    คุณลงทะเบียนคอร์สนี้แล้ว
+                  </Button>
+                </div>
+                ) : (
+                  <div key={course.ID} onClick={() => handleCourseClick()}>
+                    <Button
+                      type="primary"
+                      style={{
+                        borderRadius: '25px',
+                        marginTop: '10px',
+                        backgroundColor: '#003459',
+                        borderColor: '#003459',
+                        transition: 'background-color 0.3s, border-color 0.3s',
+                      }}
+
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#002a3d';
+                        e.currentTarget.style.borderColor = '#002a3d';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#003459';
+                        e.currentTarget.style.borderColor = '#003459';
+                      }}
+                    >
+                      ซื้อเลย
+                    </Button>
+                </div>
+                )
+              }
 
               <Divider style={{ margin: '20px' }} />
 

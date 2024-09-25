@@ -3,10 +3,11 @@ import { Card, Button, Empty } from "antd";
 import { Star } from "phosphor-react";
 import { useNavigate } from "react-router-dom";
 import HeaderComponent from "../../../components/header";
-import { GetCourseCategories, GetCourses, GetReviewById } from "../../../services/https";
+import { GetCourseCategories, GetCourses, GetReviewById, GetUserByTutorId } from "../../../services/https";
 import { CourseInterface } from "../../../interfaces/ICourse";
 import { ReviewInterface } from "../../../interfaces/IReview";
 import { CourseCategoryInterface } from "../../../interfaces/ICourse_Category";
+import { UsersInterface } from "../../../interfaces/IUser";
 
 const { Meta } = Card;
 
@@ -17,6 +18,7 @@ function Course() {
   const [reviews, setReviews] = useState<{ [courseID: number]: ReviewInterface[] }>({});
   const [averageRatings, setAverageRatings] = useState<{ [courseID: number]: number }>({});
   const [error] = useState<string | null>(null);
+  const [user, setUser] = useState<UsersInterface>();
 
   const navigate = useNavigate();
 
@@ -72,6 +74,7 @@ function Course() {
     }
   };
 
+
   useEffect(() => {
     getCourses();
     getCategories();
@@ -84,6 +87,27 @@ function Course() {
       });
     }
   }, [courses]);
+
+  const getUser = async (tutorProfileID: string) => {
+    try {
+        const UserData = await GetUserByTutorId(tutorProfileID);
+        setUser(UserData.data);
+    } catch (error) {
+        console.error(`Unknown User`, error);
+    }
+  };
+  
+
+  useEffect(() => {
+    if (courses.length > 0 && !user) {
+        const tutorProfileID = courses[0].TutorProfileID;
+        
+        if (tutorProfileID !== undefined) {
+            getUser(tutorProfileID.toString());
+        }
+    }
+  }, [courses, user]);
+
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
@@ -135,7 +159,7 @@ function Course() {
                     border: "1px solid #ddd",
                   }}
                 >
-                  <Meta title={course.Title} description={`Tutor: ${course.TutorProfileID}`} />
+                  <Meta title={course.Title} description={`Tutor: ${user?.Username ?? "ไม่ระบุ"}`} />
                   <div style={{ 
                     marginTop: "5px", 
                     display: "flex", 
@@ -232,7 +256,7 @@ function Course() {
                           border: "1px solid #ddd",
                         }}
                       >
-                        <Meta title={course.Title} description={`Tutor: ${course.TutorProfileID}`} />
+                        <Meta title={course.Title} description={`Tutor: ${user?.Username ?? "ไม่ระบุ"}`} />   
                         <div style={{ 
                           marginTop: "5px", 
                           display: "flex", 
