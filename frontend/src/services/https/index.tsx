@@ -7,6 +7,7 @@ import { PaymentsInterface } from "../../interfaces/IPayment";
 import { Tutor as TutorInterface } from "../../interfaces/Tutor";
 import { CreditCardInterface } from "../../interfaces/ICreditCard";
 import { PromptPayInterface } from "../../interfaces/IPromptpay";
+import {Task} from "../../interfaces/task"
 
 const apiUrl = "http://localhost:8000";
 
@@ -844,10 +845,34 @@ async function GetDataGraph() {
   return res;
 }
 
+//--Update--
+async function CreateUserByAdmin(userData: UsersInterface) {
+  try {
+    const response = await axios.post(`${apiUrl}/signup`, userData, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getAuthHeader(), // ใส่ Header หากมี token
+      },
+    });
 
-async function CreateUserByAdmin(data: UsersInterface) {
+    return { success: true, data: response.data }; // ส่งผลลัพธ์กลับ
+  } catch (error) {
+    console.error("Error creating user:", error);
+
+    // แสดงข้อมูลข้อผิดพลาดเพิ่มเติม
+    if (axios.isAxiosError(error)) {
+      console.error("Axios error details:", error.response?.data);
+      return { success: false, message: error.response?.data?.message || "เกิดข้อผิดพลาดในการสร้างผู้ใช้" };
+    } else {
+      return { success: false, message: "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์" }; // ข้อความทั่วไป
+    }
+  }
+}
+
+//--ปาย เพิ่มมาใหม่
+async function GetTask() {
   return await axios
-    .post(`${apiUrl}/create-user`, data, {
+    .get(`${apiUrl}/tasks`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: getAuthHeader(), // ส่ง Authorization Header ในคำขอ
@@ -856,6 +881,27 @@ async function CreateUserByAdmin(data: UsersInterface) {
     .then((res) => res)
     .catch((e) => e.response);
 }
+
+// เพิ่มมาใหม่
+
+const createTask = async (task: Omit<Task, 'id'>): Promise<Task> => {
+  try {
+    const response = await axios.post<Task>(`${apiUrl}/create-tasks`, task);
+    return response.data;
+  } catch (error) {
+    throw new Error('Error creating task: ' + error);
+  }
+};
+
+const deleteTask = async (taskId: number): Promise<void> => {
+  try {
+    const response = await axios.delete<void>(`${apiUrl}/delete-tasks/${taskId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error('Error deleting task: ' + error);
+  }
+};
+
 
 // Payment By Max ตะวันใช้ดึงข้อมูล user มารีวิว in MyCourse
 async function GetPaymentByIdUser(userID: number): Promise<any> {
@@ -1111,6 +1157,9 @@ export {
   GetTotalPaid,
   GetDataGraph,
   CreateUserByAdmin,
+  GetTask,
+  createTask,
+  deleteTask,
   //Payment Mac
   GetPaymentByIdUser, // ตะวันใช้ get ข้อมูลลง mycourse
   GetPayments,

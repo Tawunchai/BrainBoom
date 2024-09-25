@@ -146,6 +146,28 @@ func CreatePayment(c *gin.Context) {
 	c.JSON(http.StatusOK, payment)
 }
 
+// GET /total-paid
+func GetTotalPaid(c *gin.Context) {
+	var totalPaid float64
+
+	db := config.DB()
+	if db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to the database"})
+		return
+	}
+
+	// คำนวณผลรวมของการชำระเงินทั้งหมด
+	results := db.Model(&entity.Payments{}).Select("SUM(amount)").Scan(&totalPaid)
+	if results.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": results.Error.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"total_paid": totalPaid,
+	})
+}
+
 // GET /recent-transactions
 func GetRecentTransactions(c *gin.Context) {
     var payments []entity.Payments
@@ -181,26 +203,4 @@ func GetRecentTransactions(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{
         "recent_transactions": response,
     })
-}
-
-// GET /total-paid
-func GetTotalPaid(c *gin.Context) {
-	var totalPaid float64
-
-	db := config.DB()
-	if db == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to the database"})
-		return
-	}
-
-	// คำนวณผลรวมของการชำระเงินทั้งหมด
-	results := db.Model(&entity.Payments{}).Select("SUM(amount)").Scan(&totalPaid)
-	if results.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": results.Error.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"total_paid": totalPaid,
-	})
 }
