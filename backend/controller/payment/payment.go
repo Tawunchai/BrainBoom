@@ -78,53 +78,6 @@ func ListPayments(c *gin.Context) {
 }
 
 
-// GET /course-price/:id
-func GetCoursePrice(c *gin.Context) {
-	ID := c.Param("id")
-	var price float64
-
-	db := config.DB()
-	if db == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to the database"})
-		return
-	}
-
-	results := db.Model(&entity.Courses{}).Select("price").Where("id = ?", ID).Scan(&price)
-	if results.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": results.Error.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"course_id": ID,
-		"price": price,
-	})
-}
-
-// GET /course-title/:id
-func GetCourseName(c *gin.Context) {
-	ID := c.Param("id")
-	var title string
-
-	db := config.DB()
-	if db == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to the database"})
-		return
-	}
-
-	results := db.Model(&entity.Courses{}).Select("title").Where("id = ?", ID).Scan(&title)
-	if results.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": results.Error.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"course_id": ID,
-		"title": title,
-	})
-}
-
-
 // POST /payment
 func CreatePayment(c *gin.Context) {
 	var payment entity.Payments
